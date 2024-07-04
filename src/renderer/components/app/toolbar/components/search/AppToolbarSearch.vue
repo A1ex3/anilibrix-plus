@@ -16,23 +16,25 @@
     :search-input.sync="search"
     @blur="_setSearching(false)"
     @focus="_setSearching(true)"
-    @input="toRelease">
+    @input="toRelease"
+    :style="{ width: '100%' }">
 
-    <template v-slot:item="{item}">
-      <v-list-item-avatar>
-        <v-img :src="item.poster"/>
-      </v-list-item-avatar>
-      <v-list-item-content :style="{maxWidth: $refs.search.$el.clientWidth + 'px'}">
-        <v-list-item-title v-text="item.names.ru"/>
-        <v-list-item-subtitle v-text="item.names.original"/>
-      </v-list-item-content>
+    <template v-slot:item="{ item, on, attrs }">
+      <v-list-item v-bind="attrs" v-on="on">
+        <v-list-item-avatar>
+          <v-img :src="item.poster" />
+        </v-list-item-avatar>
+        <v-list-item-content :style="{ maxWidth: 'calc(100% - 56px)' }">
+          <v-list-item-title v-text="item.names.ru" />
+          <v-list-item-subtitle v-text="item.names.original" />
+        </v-list-item-content>
+      </v-list-item>
     </template>
 
   </v-autocomplete>
 </template>
 
 <script>
-
 import __debounce from 'lodash/debounce'
 import { toRelease } from '@utils/router/views'
 import { mapActions, mapState } from 'vuex'
@@ -120,3 +122,18 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@media (max-width: 600px) {
+  .v-autocomplete {
+    width: 100% !important;
+  }
+  .v-list-item-avatar {
+    min-width: 40px;
+    max-width: 40px;
+  }
+  .v-list-item-content {
+    max-width: calc(100% - 40px) !important;
+  }
+}
+</style>

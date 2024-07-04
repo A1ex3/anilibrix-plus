@@ -5,7 +5,6 @@ import { setEncrypted } from '@main/utils/safeStorage'
 import axios from 'axios'
 import axiosRetry from 'axios-retry';
 import parseTorrent from 'parse-torrent';
-import fs from 'fs';
 import qs from 'querystring';
 import { catGirlFetch } from '@utils/fetch';
 import { parse } from 'content-disposition-attachment';
