@@ -2,9 +2,7 @@
 
 ### Десктопный аниме-кинотеатр Анилибрии для любого вашего компьютера.
 
-[![Загрузите из Snap Store](https://snapcraft.io/static/images/badges/ru/snap-store-black.svg)](https://snapcraft.io/anilibrix-plus)
-
-![Anilibrix](https://raw.githubusercontent.com/pavloniym/anilibrix/master/.github/assets/anilibrix.png)
+![Anilibrix](https://github.com/A1ex3/anilibrix-plus/blob/lord/.github/assets/anilibrix.png?raw=true)
 
 ### Особенности не официальной версии (этой):
 * Вход через ВКонтакте
@@ -56,6 +54,9 @@
 * Поддержка прокси (подробнее https://github.com/AnimeHaze/anilibrix-plus/releases/tag/v1.4.3-ext.11)
 
 #### Анилибрия — так звучит аниме!
+
+### TODO:
+* [ ] Обновление приложения.
 
 ### Горячие клавиши плеера
 
