@@ -1,7 +1,24 @@
 name: Build Windows
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'lord'
+    paths-ignore:
+      - 'LICENSE'
+      - 'README.md'
+      - '.gitignore'
+  pull_request:
+    branches:
+      - 'lord'
+    paths-ignore:
+      - 'LICENSE'
+      - 'README.md'
+      - '.gitignore'
+
+env:
+  ENV_EXAMPLE_FILE: .env.example
+  PACKAGE_FILE: package.json
 
 jobs:
   release:
@@ -17,13 +34,8 @@ jobs:
       ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
       ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
       ADS_URLS: ${{ secrets.ADS_URLS }}
-      VK_APP_ID: ${{ secrets.VK_APP_ID }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      API_ENDPOINT_URL: ${{ secrets.API_ENDPOINT_URL }}
       YANDEX_TRACKING_ID: ${{ secrets.YANDEX_TRACKING_ID }}
-      STATIC_ENDPOINT_URL: ${{ secrets.STATIC_ENDPOINT_URL }}
-      DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
-      EXT_API_SERVER: ${{ secrets.EXT_API_SERVER }}
 
     steps:
       - name: Check out Git repository
@@ -33,6 +45,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Install jq
+        run: choco install jq
+      - name: Check jq version
+        run: jq --version
 
       - name: patch node gyp on windows to support Visual Studio 2019
         shell: powershell
@@ -68,6 +85,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-builder-cache-
 
+      - name: Load variables into the .env file
+        shell: bash
+        run: |
+          source ${{env.ENV_EXAMPLE_FILE}}
+
+          SENTRY_DSN="${{env.SENTRY_DSN}}"
+          YANDEX_TRACKING_ID="${{env.YANDEX_TRACKING_ID}}"
+          ADS_URLS="${{env.ADS_URLS}}"
+          
+          echo "SENTRY_DSN=$SENTRY_DSN" >> .env
+          echo "YANDEX_TRACKING_ID=$YANDEX_TRACKING_ID" >> .env
+          echo "ADS_URLS=$ADS_URLS" >> .env
+          echo "VK_APP_ID=$VK_APP_ID" >> .env
+          echo "API_ENDPOINT_URL=$API_ENDPOINT_URL" >> .env
+          echo "STATIC_ENDPOINT_URL=$STATIC_ENDPOINT_URL" >> .env
+          echo "EXT_API_SERVER=$EXT_API_SERVER" >> .env
+          echo "DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID" >> .env
+      
+      - name: Get the application version from the "package.json" file
+        shell: bash
+        run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: yarn
 
@@ -83,3 +122,21 @@ jobs:
             release/win-arm64-unpacked
             release/win-unpacked
             release/win-ia32-unpacked
+
+      - name: Archiving binary files
+        shell: powershell
+        run: |
+          Compress-Archive -Path "release\win-arm64-unpacked" -DestinationPath "win-arm64-unpacked.zip"
+          Compress-Archive -Path "release\win-unpacked" -DestinationPath "win-unpacked.zip"
+          Compress-Archive -Path "release\win-ia32-unpacked" -DestinationPath "win-ia32-unpacked.zip"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{env.APP_VERSION}}
+          files: |
+            release/*.exe
+            release/win-arm64-unpacked.zip
+            release/win-unpacked.zip
+            release/win-ia32-unpacked.zip
