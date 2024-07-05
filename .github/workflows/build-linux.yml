@@ -118,7 +118,7 @@ jobs:
       - name: Run build
         run: npm run release:linux
 
-      - name: Archive results
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: Save artifacts
