@@ -108,7 +108,9 @@ jobs:
         run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: yarn
+        run: |
+          npm install --global node-gyp@9.4.0
+          yarn
 
       - name: Run build
         run: npm run release:windows
@@ -126,9 +128,10 @@ jobs:
       - name: Archiving binary files
         shell: powershell
         run: |
-          Compress-Archive -Path "release\win-arm64-unpacked" -DestinationPath "win-arm64-unpacked.zip"
-          Compress-Archive -Path "release\win-unpacked" -DestinationPath "win-unpacked.zip"
-          Compress-Archive -Path "release\win-ia32-unpacked" -DestinationPath "win-ia32-unpacked.zip"
+          cd release
+          Compress-Archive -Path "win-arm64-unpacked" -DestinationPath "..\win-arm64-unpacked.zip"
+          Compress-Archive -Path "win-unpacked" -DestinationPath "..\win-unpacked.zip"
+          Compress-Archive -Path "win-ia32-unpacked" -DestinationPath "..\win-ia32-unpacked.zip"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -137,6 +140,6 @@ jobs:
           tag_name: ${{env.APP_VERSION}}
           files: |
             release/*.exe
-            release/win-arm64-unpacked.zip
-            release/win-unpacked.zip
-            release/win-ia32-unpacked.zip
+            win-arm64-unpacked.zip
+            win-unpacked.zip
+            win-ia32-unpacked.zip

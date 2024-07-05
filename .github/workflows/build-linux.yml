@@ -131,9 +131,10 @@ jobs:
       
       - name: Archiving binary files
         run: |
-          zip -r linux-arm64-unpacked.zip ./release/linux-arm64-unpacked
-          zip -r linux-unpacked.zip ./release/linux-unpacked
-          zip -r linux-ia32-unpacked.zip ./release/linux-ia32-unpacked
+          cd release
+          zip -r ../linux-arm64-unpacked.zip linux-arm64-unpacked
+          zip -r ../linux-unpacked.zip linux-unpacked
+          zip -r ../linux-ia32-unpacked.zip linux-ia32-unpacked
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
