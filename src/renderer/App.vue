@@ -142,7 +142,7 @@ export default {
 
     view: {
       handler (view) {
-        if (['releases', 'catalog', 'favorites'].includes(view)) this._setWelcomeView(view)
+        if (['releases', 'catalog', 'schedule', 'favorites'].includes(view)) this._setWelcomeView(view)
       }
     }
 

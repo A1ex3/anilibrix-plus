@@ -4,9 +4,10 @@ const TOGGLE_DEVTOOLS = 'TOGGLE_DEVTOOLS'
 const SET_ADS_MAXIMUM = 'SET_ADS_MAXIMUM'
 const SET_UPDATES_TIMEOUT = 'SET_UPDATES_TIMEOUT'
 const SET_SYSTEM_NOTIFICATIONS = 'SET_SYSTEM_NOTIFICATIONS'
-const SET_APPBAR_RIGHT = 'SET_APPBAR_RIGHT';
-const SET_FILTER_NOTIFY = 'SET_FILTER_NOTIFY';
+const SET_APPBAR_RIGHT = 'SET_APPBAR_RIGHT'
+const SET_FILTER_NOTIFY = 'SET_FILTER_NOTIFY'
 const SET_API_ENDPOINT = 'SET_API_ENDPOINT'
+const SET_EXT_API_ENDPOINT = 'SET_EXT_API_ENDPOINT'
 const SET_API_STATIC_ENDPOINT = 'SET_API_STATIC_ENDPOINT'
 const SET_TORRENT_TYPE = 'SET_TORRENT_TYPE'
 const SET_DRPC = 'SET_DRPC'
@@ -28,6 +29,7 @@ export default {
     },
     api: {
       endpoint: process.env.API_ENDPOINT_URL,
+      ext_endpoint: process.env.EXT_API_SERVER,
       static_endpoint: process.env.STATIC_ENDPOINT_URL
     },
     notifications: {
@@ -41,6 +43,7 @@ export default {
     [SET_TORRENT_TYPE]: (s, state) => (s.torrentType = state),
     [SET_DRPC]: (s, state) => (s.drpc_enabled = state),
     [SET_API_ENDPOINT]: (s, state) => (s.api.endpoint = state),
+    [SET_EXT_API_ENDPOINT]: (s, state) => (s.api.ext_endpoint = state),
     [SET_API_STATIC_ENDPOINT]: (s, state) => (s.api.static_endpoint = state),
     /**
      * Set updates state
@@ -133,6 +136,7 @@ export default {
      * @return {*}
      */
     setAPIEndpoint: ({ commit }, state) => commit(SET_API_ENDPOINT, state),
+    setExtAPIEndpoint: ({ commit }, state) => commit(SET_EXT_API_ENDPOINT, state),
     setAPIStaticEndpoint: ({ commit }, state) => commit(SET_API_STATIC_ENDPOINT, state),
 
     /**

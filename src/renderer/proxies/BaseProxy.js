@@ -23,7 +23,8 @@ export default class BaseProxy {
     // eslint-disable-next-line no-return-await
     return await axios.request({
       url,
-      method, ...parameters,
+      method,
+      ...parameters,
       headers,
       timeout: 15000
     })
@@ -56,6 +57,18 @@ export default class BaseProxy {
     const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
     console.log('Endpoint', endpoint)
     return endpoint + '/public/api/index.php'
+  }
+
+  /**
+   * Get extended api endpoint url
+   *
+   * @param api_version - default value "v1"
+   * @return {string}
+   */
+  getApiEndpointExtend (api_version = "v1") {
+    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint.replace("v1", api_version)
+    console.log('Extend endpoint', endpoint)
+    return endpoint
   }
 
   getTorrentEndpoint () {

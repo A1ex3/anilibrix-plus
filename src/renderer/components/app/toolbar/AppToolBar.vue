@@ -6,7 +6,12 @@
     <!-- Dropdown Menu -->
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn icon v-bind="attrs" v-on="on">
+        <v-tooltip left activator="#toolbar__menu">
+          <div class="py-1">
+            <div class="font-weight">Меню</div>
+          </div>
+        </v-tooltip>
+        <v-btn id="toolbar__menu" icon v-bind="attrs" v-on="on">
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
       </template>
@@ -27,6 +32,15 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Каталог</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <!-- Schedule -->
+        <v-list-item :to="{name: 'schedule'}" exact>
+          <v-list-item-icon>
+            <v-icon>mdi-calendar</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Расписание</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <!-- Favorites -->

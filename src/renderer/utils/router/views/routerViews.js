@@ -5,6 +5,7 @@ const VIDEO_VIEW = 'video'
 const BLANK_VIEW = 'blank'
 const RELEASE_VIEW = 'release'
 const RELEASES_VIEW = 'releases'
+const SCHEDULE_VIEW = 'schedule'
 const FAVORITES_VIEW = 'favorites'
 const ACCOUNT_LOGIN_VIEW = 'account.login'
 
@@ -59,6 +60,15 @@ export const toRelease = (release = null) => {
  */
 export const toReleases = () => {
   return router.push({ name: RELEASES_VIEW })
+}
+
+/**
+ * Go to schedule
+ *
+ * @return {Promise<Route>}
+ */
+export const toSchedule = () => {
+  return router.push({ name: SCHEDULE_VIEW })
 }
 
 /**

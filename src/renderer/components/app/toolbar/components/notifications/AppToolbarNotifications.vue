@@ -1,6 +1,11 @@
 <template>
   <div>
     <!-- Icon -->
+    <v-tooltip left activator="#toolbar__notifications">
+      <div class="py-1">
+        <div class="font-weight">Уведомления</div>
+      </div>
+    </v-tooltip>
     <v-badge
       overlap
       bordered

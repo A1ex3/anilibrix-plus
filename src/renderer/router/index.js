@@ -5,6 +5,7 @@ import ads from './ads'
 import blank from './blank'
 import video from './video'
 import release from './release'
+import schedule from './schedule'
 import catalog from './catalog'
 import account from './account'
 import releases from './releases'
@@ -28,6 +29,7 @@ const router = new Router({
     catalog,
     account,
     releases,
+    schedule,
     favorites
   )
 })

@@ -64,6 +64,16 @@
         <v-combobox
           outlined
           class="mb-2"
+          :value="_ext_api_endpoint"
+          @input="_setExtAPIEndpoint($event ? $event : process.env.EXT_API_SERVER)"
+          :items="['https://api.anilibria.tv/api/v1', 'https://api.anilib.top/api/v1']"
+          label="Точка подключения к API (новые версии)"
+          persistent-hint
+        />
+
+        <v-combobox
+          outlined
+          class="mb-2"
           :value="_static_endpoint"
           @input="_setAPIStaticEndpoint($event ? $event : process.env.STATIC_ENDPOINT_URL)"
           :items="['https://static-libria.weekstorm.one/', 'https://static.anilibria.tv/', 'https://static.wwnd.space/', 'https://anilibriaqt.anilib.top/', 'https://anilibrix.anilib.top/', 'https://anilibria.animehaze.me/']"
@@ -75,7 +85,7 @@
           Вы можете использовать основной домен, если он не заблокирован вашим провайдером, или использовать
           дополнительные домены
 
-          Вы можете ввесли свю точку подключения к API и серверу статики в поле "Точка подключения к API" и "Точка подключения к серверу статики"
+          Вы можете ввести свю точку подключения к API и серверу статики в поле "Точка подключения к API", "Точка подключения к API (новые версии)" и "Точка подключения к серверу статики"
 
           <b>После изменения точки доступа рекомендуется перезагрузить приложение</b>
         </div>
@@ -235,6 +245,7 @@ export default {
       _updates_enabled: s => s.updates.enabled,
       _updates_timeout: s => s.updates.timeout,
       _api_endpoint: s => s.api.endpoint,
+      _ext_api_endpoint: s => s.api.ext_endpoint,
       _static_endpoint: s => s.api.static_endpoint,
       _notifications_system: s => s.notifications.system,
       _appbar_right: s => s.appbar_right,
@@ -259,6 +270,7 @@ export default {
       _setUpdatesTimeout: 'setUpdatesTimeout',
       _setSystemNotifications: 'setSystemNotifications',
       _setAPIEndpoint: 'setAPIEndpoint',
+      _setExtAPIEndpoint: 'setExtAPIEndpoint',
       _setAPIStaticEndpoint: 'setAPIStaticEndpoint',
       _setAppbarRight: 'setAppbarRight',
       _setFilterNotify: 'setFilterNotify',
