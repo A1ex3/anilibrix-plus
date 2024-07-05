@@ -83,13 +83,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-builder-cache-
 
-      - name: Get Change log
-        shell: bash
-        run: |
-          sudo chmod +x .ci/get_changelog.sh
-          ./.ci/get_changelog.sh ${{env.CHANGELOG_FILE}} ${{env.APP_VERSION}} > ${{ env.CHANGELOG_FILE }}.tmp
-          cat ${{ env.CHANGELOG_FILE }}.tmp
-
       - name: Load variables into the .env file
         shell: bash
         run: |
@@ -111,6 +104,13 @@ jobs:
       - name: Get the application version from the "package.json" file
         shell: bash
         run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
+
+      - name: Get Change log
+        shell: bash
+        run: |
+          sudo chmod +x .ci/get_changelog.sh
+          ./.ci/get_changelog.sh ${{env.CHANGELOG_FILE}} ${{env.APP_VERSION}} > ${{ env.CHANGELOG_FILE }}.tmp
+          cat ${{ env.CHANGELOG_FILE }}.tmp
 
       - name: Install dependencies
         run: yarn
