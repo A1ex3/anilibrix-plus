@@ -213,20 +213,16 @@ export const invokeRand = () => ipcRenderer.invoke(APP_RAND)
 export const handleRand = () => {
   ipcMain.handle(APP_RAND, async (event) => {
     const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
-    const { hostname } = new URL(endpoint)
-    const parts = hostname.split('.')
-    if (parts.length > 2) {
-      parts.shift()
-    }
+    const ext_endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint
 
     try {
-      const { data } = await axios.get(`https://api.${parts.join('.')}/v3/title/random`)
+      const { data } = await axios.get(`${ext_endpoint.replace("v1", "v3")}/title/random`)
       console.log('Rand:', data.id)
       return { id: data.id, name: data.names.en }
     } catch (e) {
-      if (e.response.status === 404) {
-        const { data: { data: { code } } } = await axios.post(`https://${hostname}/public/api/index.php`, new URLSearchParams({ query: 'random_release' }))
-        const { data: { data: { id, names } } } = await axios.post(`https://${hostname}/public/api/index.php`, new URLSearchParams({
+      if (e.response != null || e.response != undefined) {
+        const { data: { data: { code } } } = await axios.post(`${endpoint}/public/api/index.php`, new URLSearchParams({ query: 'random_release' }))
+        const { data: { data: { id, names } } } = await axios.post(`${endpoint}/public/api/index.php`, new URLSearchParams({
           query: 'release',
           code: code
         }))
