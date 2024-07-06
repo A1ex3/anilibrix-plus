@@ -33,9 +33,6 @@ jobs:
     env:
       ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
       ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
-      ADS_URLS: ${{ secrets.ADS_URLS }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      YANDEX_TRACKING_ID: ${{ secrets.YANDEX_TRACKING_ID }}
       PYTHON: python3.10
       NODE_GYP_FORCE_PYTHON: python3.10
 
@@ -92,9 +89,9 @@ jobs:
         run: |
           source ${{env.ENV_EXAMPLE_FILE}}
 
-          SENTRY_DSN="${{env.SENTRY_DSN}}"
-          YANDEX_TRACKING_ID="${{env.YANDEX_TRACKING_ID}}"
-          ADS_URLS="${{env.ADS_URLS}}"
+          SENTRY_DSN="${{ secrets.SENTRY_DSN }}"
+          YANDEX_TRACKING_ID="${{ secrets.YANDEX_TRACKING_ID }}"
+          ADS_URLS="${{ secrets.ADS_URLS }}"
           
           echo "SENTRY_DSN=$SENTRY_DSN" >> .env
           echo "YANDEX_TRACKING_ID=$YANDEX_TRACKING_ID" >> .env
