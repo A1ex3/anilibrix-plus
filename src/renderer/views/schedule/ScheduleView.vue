@@ -5,7 +5,7 @@
     </v-layout>
     <v-layout v-else column class="schedule">
       <div v-for="(day, index) in data" :key="index" class="schedule-day">
-        <h2>{{ getDayLabel(day.day) }}</h2>
+        <h2 :class="{ 'today': index === todayIndex }">{{ getDayLabel(day.day) }}</h2>
         <v-slide-group show-arrows>
           <v-slide-item v-for="release in day.list" :key="release.id" class="mx-2">
             <v-card class="schedule-card" v-bind="{release}" :ref="release.id" :key="release.id" @click="toRelease(release)">
@@ -82,6 +82,18 @@ export default {
 
 .schedule-day {
   margin-bottom: 40px;
+}
+
+.schedule-day h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0;
+  color: #525252;
+}
+
+.schedule-day h2.today {
+  color: #d3d3d3;
 }
 
 .schedule-card {
