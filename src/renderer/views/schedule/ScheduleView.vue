@@ -66,7 +66,7 @@ export default {
       const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
       let dayLabel = daysOfWeek[dayIndex];
       if (dayIndex === this.todayIndex) {
-        dayLabel += ' (Сегодня)';
+        dayLabel += ' (сегодня)';
       }
       return dayLabel;
     },
