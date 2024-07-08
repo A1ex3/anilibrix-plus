@@ -6,48 +6,51 @@ import (
 	"mdupdater/archive"
 	"mdupdater/files"
 	"mdupdater/process"
+	"strconv"
 	"strings"
 )
 
 func main() {
-	AppFullPath := flag.String("APP_FULL_PATH", "", "application path")
-	UpdatesFullPath := flag.String("UPDATES_FULL_PATH", "", "path to the directory with updated files")
-	ArchiveFileFullPath := flag.String("ARCHIVE_FILE_FULL_PATH", "", "archive file path")
-	MainProgramName := flag.String("MAIN_PROGRAM_NAME", "", "application name")
-	FileIgnore := flag.String("FILE_IGNORE", "", "comma-delimited list of files to ignore")
-	FileDeleteAfter := flag.String("FILE_DELETE_AFTER", "", "delete unnecessary files after the upgrade is complete.")
-	RunAfter := flag.String("RUN_FILE_AFTER", "", "runs the file after all operations have completed.")
+	appFullPathDir := flag.String("APP_FULL_PATH_DIR", "", "")
+	closeAppsBeforePidsList := flag.String("CLOSE_APPS_BEFORE_PIDS_LIST", "", "")
+	archiveFileFullPath := flag.String("ARCHIVE_FILE_FULL_PATH", "", "")
+	updateDirectoryName := flag.String("UPDATE_DIR", "", "")
+	filesIgnoreList := flag.String("FILES_IGNORE_LIST", "", "")
+	filesDeleteAfterList := flag.String("FILES_DELETE_AFTER_LIST", "", "")
 
 	flag.Parse()
 
-	if *AppFullPath == "" || *ArchiveFileFullPath == "" || *UpdatesFullPath == "" || *MainProgramName == "" {
-		log.Fatalln("You must specify values for the variables APP_FULL_PATH, UPDATES_FULL_PATH, ARCHIVE_FILE_FULL_PATH, and MAIN_PROGRAM_NAME.")
+	if *appFullPathDir == "" || *closeAppsBeforePidsList == "" || *archiveFileFullPath == "" || *updateDirectoryName == "" || *filesIgnoreList == "" || *filesDeleteAfterList == "" {
+		log.Fatalln("You must specify values for the variables APP_FULL_PATH_DIR, CLOSE_APPS_BEFORE_PIDS_LIST, ARCHIVE_FILE_FULL_PATH, UPDATE_DIR, FILES_IGNORE_LIST and FILES_DELETE_AFTER_LIST.")
 		return
 	}
 
-	var ignoreList []string
-	if *FileIgnore != "" {
-		ignoreList = strings.Split(*FileIgnore, ",")
-	}
-
-	var deleteAfterList []string
-	if *FileDeleteAfter != "" {
-		deleteAfterList = strings.Split(*FileDeleteAfter, ",")
-	}
-
-	_process_ := process.NewProcess()
-	_processPId_, processPIdErr := _process_.FindPIdByName(*MainProgramName)
-	if processPIdErr == nil {
-		_process_.Kill(int64(_processPId_))
+	var ignoreList []string = strings.Split(*filesIgnoreList, ",")
+	var deleteAfterList []string = strings.Split(*filesDeleteAfterList, ",")
+	var closeAppsBeforePids []int
+	for _, i := range strings.Split(*closeAppsBeforePidsList, ",") {
+		j, err := strconv.Atoi(i)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		closeAppsBeforePids = append(closeAppsBeforePids, j)
 	}
 
 	archive := archive.NewArchive()
-	fileSync := files.NewFileSync(*UpdatesFullPath, *AppFullPath, ignoreList)
+	fileSync := files.NewFileSync(*appFullPathDir+*updateDirectoryName, *appFullPathDir, ignoreList)
 
-	err := archive.ExtractArchive(*ArchiveFileFullPath, *AppFullPath)
+	err := archive.ExtractArchive(*archiveFileFullPath, *appFullPathDir)
 	if err != nil {
 		log.Fatalf("archive extraction error: %v\n", err)
 		return
+	}
+
+	_process_ := process.NewProcess()
+	for _, val := range closeAppsBeforePids {
+		processKillErr := _process_.Kill(int64(val))
+		if processKillErr != nil {
+			log.Fatalln(processKillErr)
+		}
 	}
 
 	err = fileSync.SyncFiles()
@@ -56,18 +59,10 @@ func main() {
 		return
 	}
 
-	delErr := fileSync.DeleteAfter(*AppFullPath, deleteAfterList)
-	if delErr != nil {
+	delErr := fileSync.DeleteAfter(*appFullPathDir, deleteAfterList)
+	if (delErr) != nil {
 		log.Fatalf("error when deleting objects: %v\n", delErr)
 		return
-	}
-
-	if *RunAfter != "" {
-		runErr := fileSync.RunAfter(*RunAfter)
-		if runErr != nil {
-			log.Fatalf("file startup error: %v\n", runErr)
-			return
-		}
 	}
 
 	log.Println("file update was successful.")

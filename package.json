@@ -1,6 +1,7 @@
 {
   "name": "anilibrix",
   "version": "v1.5.1",
+  "updater_hash_sha512": "",
   "author": {
     "name": "Anilibria",
     "email": "anilibria@protonmail.com",
@@ -28,8 +29,7 @@
       "github": "https://github.com/A1ex3/anilibrix-plus",
       "donate": "https://www.anilibria.tv/pages/donate.php",
       "telegram": "tg://resolve?domain=anilibrix",
-      "anilibria": "https://anilibria.tv",
-      "unofficial": "tg://resolve?domain=anilibrix_plus"
+      "anilibria": "https://anilibria.tv"
     }
   },
   "build": {
@@ -42,6 +42,15 @@
     "files": [
       "dist/electron/**/*",
       "build/icons/**/*"
+    ],
+    "extraFiles": [
+      {
+        "from": "path/to/updater_file",
+        "to": ".",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "publish": {
       "provider": "github",

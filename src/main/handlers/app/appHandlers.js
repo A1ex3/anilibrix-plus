@@ -26,6 +26,7 @@ export const APP_DISCORD_RICH_PRESENSE = 'app:richpresense'
 export const APP_ABOUT = 'app:about'
 export const APP_SYSTEM_SLEEP_DISABLE = 'app:system:disable_sleep'
 export const APP_SYSTEM_SLEEP_ENABLE = 'app:system:enable_sleep'
+export const APP_SYSTEM_INFO = 'app:system:info'
 export const APP_DOCK_NUMBER = 'app:dock:number'
 export const APP_DEVTOOLS_MAIN = 'app:devtools:main'
 export const APP_DEVTOOLS_TORRENT = 'app:devtools:torrent'
@@ -156,6 +157,29 @@ export const invokeSafeStorageEncrypt = (prop, data) => ipcRenderer.invoke(APP_S
 export const handleSafeStorageEncrypt = () => {
   ipcMain.handle(APP_SAFE_STORAGE_ENCRYPT_REQUEST, async (event, prop, data) => {
     return setEncrypted(prop, data)
+  })
+}
+
+/**
+ * Get application system information
+ *
+ * @param {string} prop Property name
+ * @param {string} data Data to encrypt
+ * @return {Promise<string>}
+ */
+export const invokeAppSystemInfo = (prop, data) => ipcRenderer.invoke(APP_SYSTEM_INFO, prop, data)
+
+/**
+ * Get application system information
+ *
+ * @return {void}
+ */
+export const handleAppSystemInfo = () => {
+  ipcMain.handle(APP_SYSTEM_INFO, async () => {
+    return {
+      app_full_path: app.getPath('exe'),
+      main_pid: process.pid
+    };
   })
 }
 
