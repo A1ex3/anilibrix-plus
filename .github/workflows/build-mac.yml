@@ -101,6 +101,7 @@ jobs:
           echo "STATIC_ENDPOINT_URL=$STATIC_ENDPOINT_URL" >> .env
           echo "EXT_API_SERVER=$EXT_API_SERVER" >> .env
           echo "DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID" >> .env
+          echo "APP_UPDATE_CHANNEL_ENDPOINT_URL=$APP_UPDATE_CHANNEL_ENDPOINT_URL" >> .env
       
       - name: Get the application version from the "package.json" file
         shell: bash
