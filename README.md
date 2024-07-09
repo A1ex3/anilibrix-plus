@@ -2,7 +2,7 @@
 
 ### Десктопный аниме-кинотеатр Анилибрии для любого вашего компьютера.
 
-![Anilibrix](https://raw.githubusercontent.com/A1ex3/anilibrix-plus/lord/.github/assets/anilibrix.png)
+![Anilibrix](https://raw.githubusercontent.com/A1ex3/anilibrix-plus/main/.github/assets/anilibrix.png)
 
 ### Особенности неофициальной версии (этой):
 * Вход через ВКонтакте
