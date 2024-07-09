@@ -19,6 +19,7 @@ on:
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
+  BUILD_DIR_TEMP: build_temp
 
 jobs:
   release:
@@ -33,9 +34,6 @@ jobs:
     env:
       ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
       ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
-      ADS_URLS: ${{ secrets.ADS_URLS }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      YANDEX_TRACKING_ID: ${{ secrets.YANDEX_TRACKING_ID }}
 
     steps:
       - name: Check out Git repository
@@ -46,10 +44,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Setup Go 1.21.x
+        uses: actions/setup-go@v4
+        with:
+            go-version: '1.21.x'
+
       - name: Install jq
         run: choco install jq
       - name: Check jq version
         run: jq --version
+
+      - name: Install make
+        run: choco install make
+      - name: Check make version
+        run: make --version
 
       - name: patch node gyp on windows to support Visual Studio 2019
         shell: powershell
@@ -90,9 +98,9 @@ jobs:
         run: |
           source ${{env.ENV_EXAMPLE_FILE}}
 
-          SENTRY_DSN="${{env.SENTRY_DSN}}"
-          YANDEX_TRACKING_ID="${{env.YANDEX_TRACKING_ID}}"
-          ADS_URLS="${{env.ADS_URLS}}"
+          SENTRY_DSN="${{ secrets.SENTRY_DSN }}"
+          YANDEX_TRACKING_ID="${{ secrets.YANDEX_TRACKING_ID }}"
+          ADS_URLS="${{ secrets.ADS_URLS }}"
           
           echo "SENTRY_DSN=$SENTRY_DSN" >> .env
           echo "YANDEX_TRACKING_ID=$YANDEX_TRACKING_ID" >> .env
@@ -102,6 +110,7 @@ jobs:
           echo "STATIC_ENDPOINT_URL=$STATIC_ENDPOINT_URL" >> .env
           echo "EXT_API_SERVER=$EXT_API_SERVER" >> .env
           echo "DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID" >> .env
+          echo "APP_UPDATE_CHANNEL_ENDPOINT_URL=$APP_UPDATE_CHANNEL_ENDPOINT_URL" >> .env
       
       - name: Get the application version from the "package.json" file
         shell: bash
@@ -113,33 +122,56 @@ jobs:
           yarn
 
       - name: Run build
-        run: npm run release:windows
+        shell: bash
+        run: |
+          mkdir -p ${{env.BUILD_DIR_TEMP}}
+
+          updater_path=updater/build/updater.exe
+          sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
+
+          cd updater && make build-amd64 && cd ..
+          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
+          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          npm run release:windows
+          mv release/*-win-*-setup.exe ${{env.BUILD_DIR_TEMP}}/
+          mv release/win-unpacked ${{env.BUILD_DIR_TEMP}}/
+
+          cd updater && make build-arm64 && cd ..
+          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
+          sed -i 's/"updater_hash_sha512": "",/"updater_hash_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
+          npm run release:windows
+          mv release/win-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
+
+          rm -rf $updater_path
+          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          npm run release:windows
+          find release -type f -regex '.*-win-[0-9]+\.[0-9]+\.[0-9]+\.exe' -exec mv {} ${{env.BUILD_DIR_TEMP}} \;
+          mv release/*-win-ia32-*.exe ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-win-x64-*.exe ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-win-arm64-*.exe ${{env.BUILD_DIR_TEMP}}/
+          mv release/win-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: Save artifacts
-          path: |
-            release/*.exe
-            release/win-arm64-unpacked
-            release/win-unpacked
-            release/win-ia32-unpacked
+          path: ${{env.BUILD_DIR_TEMP}}/*
 
       - name: Archiving binary files
         shell: powershell
         run: |
-          cd release
-          Compress-Archive -Path "win-arm64-unpacked" -DestinationPath "..\win-arm64-unpacked.zip"
-          Compress-Archive -Path "win-unpacked" -DestinationPath "..\win-unpacked.zip"
-          Compress-Archive -Path "win-ia32-unpacked" -DestinationPath "..\win-ia32-unpacked.zip"
+          cd ${{env.BUILD_DIR_TEMP}}
+          Compress-Archive -Path "win-arm64-unpacked" -DestinationPath "win-arm64-unpacked.zip"
+          Compress-Archive -Path "win-unpacked" -DestinationPath "win-unpacked.zip"
+          Compress-Archive -Path "win-ia32-unpacked" -DestinationPath "win-ia32-unpacked.zip"
+
+          Remove-Item -Path "win-arm64-unpacked" -Recurse -Force
+          Remove-Item -Path "win-unpacked" -Recurse -Force
+          Remove-Item -Path "win-ia32-unpacked" -Recurse -Force
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
           tag_name: ${{env.APP_VERSION}}
-          files: |
-            release/*.exe
-            win-arm64-unpacked.zip
-            win-unpacked.zip
-            win-ia32-unpacked.zip
+          files: ${{env.BUILD_DIR_TEMP}}/*

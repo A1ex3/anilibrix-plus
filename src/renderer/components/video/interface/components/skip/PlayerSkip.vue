@@ -83,7 +83,7 @@ export default {
     //  * @return void
     //  */
     showToast() {
-      this.$toasted.show('Метка пропущена', {
+      this.$toasted.show('Заставка пропущена', {
         type: 'info',
         position: 'top-center'
       })

@@ -42,7 +42,8 @@ import {
   handleRichPresense,
   handleSafeStorageEncrypt,
   handleShowConfig,
-  handleTorrentParse
+  handleTorrentParse,
+  handleAppSystemInfo
 } from '@main/handlers/app/appHandlers'
 
 // Torrent Handlers
@@ -206,7 +207,8 @@ const appHandlers = () => {
   handleRichPresense(setActivity)
   handleRand()
   handleShowConfig()
-  handleTorrentParse()
+  handleTorrentParse(),
+  handleAppSystemInfo()
 }
 
 /**

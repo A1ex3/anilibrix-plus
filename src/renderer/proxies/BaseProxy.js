@@ -71,6 +71,17 @@ export default class BaseProxy {
     return endpoint
   }
 
+  /**
+   * Get application update channel endpoint url
+   *
+   * @return {string}
+   */
+  getAppUpdateChannelEndpoint () {
+    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.app_update_channel_endpoint
+    console.log('Application update channel endpoint', endpoint)
+    return endpoint
+  }
+
   getTorrentEndpoint () {
     const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
     console.log('Endpoint for torrent', endpoint)

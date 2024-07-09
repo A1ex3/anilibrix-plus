@@ -20,6 +20,7 @@ env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
   CHANGELOG_FILE: changelog.txt
+  BUILD_DIR_TEMP: build_temp
 
 jobs:
   release:
@@ -34,9 +35,6 @@ jobs:
     env:
       ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
       ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
-      ADS_URLS: ${{ secrets.ADS_URLS }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      YANDEX_TRACKING_ID: ${{ secrets.YANDEX_TRACKING_ID }}
 
     steps:
       - name: Check out Git repository
@@ -46,6 +44,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Setup Go 1.21.x
+        uses: actions/setup-go@v4
+        with:
+            go-version: '1.21.x'
 
       - name: Install jq
         run: sudo apt-get install jq -y
@@ -88,10 +91,10 @@ jobs:
         run: |
           source ${{env.ENV_EXAMPLE_FILE}}
 
-          SENTRY_DSN="${{env.SENTRY_DSN}}"
-          YANDEX_TRACKING_ID="${{env.YANDEX_TRACKING_ID}}"
-          ADS_URLS="${{env.ADS_URLS}}"
-          
+          SENTRY_DSN="${{ secrets.SENTRY_DSN }}"
+          YANDEX_TRACKING_ID="${{ secrets.YANDEX_TRACKING_ID }}"
+          ADS_URLS="${{ secrets.ADS_URLS }}"
+
           echo "SENTRY_DSN=$SENTRY_DSN" >> .env
           echo "YANDEX_TRACKING_ID=$YANDEX_TRACKING_ID" >> .env
           echo "ADS_URLS=$ADS_URLS" >> .env
@@ -100,6 +103,7 @@ jobs:
           echo "STATIC_ENDPOINT_URL=$STATIC_ENDPOINT_URL" >> .env
           echo "EXT_API_SERVER=$EXT_API_SERVER" >> .env
           echo "DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID" >> .env
+          echo "APP_UPDATE_CHANNEL_ENDPOINT_URL=$APP_UPDATE_CHANNEL_ENDPOINT_URL" >> .env
       
       - name: Get the application version from the "package.json" file
         shell: bash
@@ -116,25 +120,48 @@ jobs:
         run: yarn
 
       - name: Run build
-        run: npm run release:linux
+        shell: bash
+        run: |
+          mkdir -p ${{env.BUILD_DIR_TEMP}}
+
+          updater_path=updater/build/updater
+          sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
+
+          cd updater && make build-amd64 && cd ..
+          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
+          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          npm run release:linux
+          mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
+          mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
+
+          cd updater && make build-arm64 && cd ..
+          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
+          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          npm run release:linux
+          mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
+          mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
+
+          rm -rf $updater_path
+          sed -i 's/"updater_hash_sha512": "[^"]*",/"updater_hash_sha512": "",/' ${{env.PACKAGE_FILE}}
+          npm run release:linux
+          mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
+          mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: Save artifacts
-          path: |
-            release/*.snap
-            release/*.AppImage
-            release/linux-arm64-unpacked
-            release/linux-unpacked
-            release/linux-ia32-unpacked
-      
+          path: ${{env.BUILD_DIR_TEMP}}/*
+
       - name: Archiving binary files
         run: |
-          cd release
-          zip -r ../linux-arm64-unpacked.zip linux-arm64-unpacked
-          zip -r ../linux-unpacked.zip linux-unpacked
-          zip -r ../linux-ia32-unpacked.zip linux-ia32-unpacked
+          cd ${{env.BUILD_DIR_TEMP}}
+          zip -r linux-arm64-unpacked.zip linux-arm64-unpacked
+          zip -r linux-unpacked.zip linux-unpacked
+          zip -r linux-ia32-unpacked.zip linux-ia32-unpacked
+
+          rm -rf linux-arm64-unpacked linux-unpacked linux-ia32-unpacked
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -142,9 +169,4 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           body_path: ${{ env.CHANGELOG_FILE }}.tmp
           tag_name: ${{env.APP_VERSION}}
-          files: |
-            release/*.snap
-            release/*.AppImage
-            linux-arm64-unpacked.zip
-            linux-unpacked.zip
-            linux-ia32-unpacked.zip
+          files: ${{env.BUILD_DIR_TEMP}}/*

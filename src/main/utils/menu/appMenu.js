@@ -23,10 +23,6 @@ export const aboutTemplate = [
     click: () => shell.openExternal(meta.links.anilibria)
   },
   {
-    label: 'Канал не официальных релизов',
-    click: () => shell.openExternal(meta.links.unofficial)
-  },
-  {
     label: 'Поддержать проект',
     click: () => shell.openExternal(meta.links.donate)
   },

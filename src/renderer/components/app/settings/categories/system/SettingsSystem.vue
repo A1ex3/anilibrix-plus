@@ -81,13 +81,23 @@
           persistent-hint
         />
 
+        <v-combobox
+          outlined
+          class="mb-2"
+          :value="_app_update_channel_endpoint"
+          @input="_setAppUpdateChannelEndpoint($event ? $event : process.env.APP_UPDATE_CHANNEL_ENDPOINT_URL)"
+          :items="['https://api.github.com/repos/A1ex3/anilibrix-plus/releases']"
+          label="Точка подключения к каналу обновлений приложения"
+          persistent-hint
+        />
+
         <div class="caption">
           Вы можете использовать основной домен, если он не заблокирован вашим провайдером, или использовать
-          дополнительные домены
+          дополнительные домены.
 
-          Вы можете ввести свю точку подключения к API и серверу статики в поле "Точка подключения к API", "Точка подключения к API (новые версии)" и "Точка подключения к серверу статики"
+          Вы можете ввести свю точку подключения к API, серверу статики и каналу обновлений приложения в поле "Точка подключения к API", "Точка подключения к API (новые версии)", "Точка подключения к серверу статики" и "Точка подключения к каналу обновлений приложения".
 
-          <b>После изменения точки доступа рекомендуется перезагрузить приложение</b>
+          <b>После изменения точки доступа рекомендуется перезагрузить приложение.</b>
         </div>
       </v-card-text>
     </v-card>
@@ -247,6 +257,7 @@ export default {
       _api_endpoint: s => s.api.endpoint,
       _ext_api_endpoint: s => s.api.ext_endpoint,
       _static_endpoint: s => s.api.static_endpoint,
+      _app_update_channel_endpoint: s => s.api.app_update_channel_endpoint,
       _notifications_system: s => s.notifications.system,
       _appbar_right: s => s.appbar_right,
       _filter_notify: s => s.filter_notify,
@@ -272,6 +283,7 @@ export default {
       _setAPIEndpoint: 'setAPIEndpoint',
       _setExtAPIEndpoint: 'setExtAPIEndpoint',
       _setAPIStaticEndpoint: 'setAPIStaticEndpoint',
+      _setAppUpdateChannelEndpoint: 'setAppUpdateChannelEndpoint',
       _setAppbarRight: 'setAppbarRight',
       _setFilterNotify: 'setFilterNotify',
       _setDRPC: 'setDRPC'

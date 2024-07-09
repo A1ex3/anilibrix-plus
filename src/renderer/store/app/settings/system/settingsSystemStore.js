@@ -9,6 +9,7 @@ const SET_FILTER_NOTIFY = 'SET_FILTER_NOTIFY'
 const SET_API_ENDPOINT = 'SET_API_ENDPOINT'
 const SET_EXT_API_ENDPOINT = 'SET_EXT_API_ENDPOINT'
 const SET_API_STATIC_ENDPOINT = 'SET_API_STATIC_ENDPOINT'
+const SET_APP_UPDATE_CHANNEL_ENDPOINT = 'SET_APP_UPDATE_CHANNEL_ENDPOINT'
 const SET_TORRENT_TYPE = 'SET_TORRENT_TYPE'
 const SET_DRPC = 'SET_DRPC'
 
@@ -30,7 +31,8 @@ export default {
     api: {
       endpoint: process.env.API_ENDPOINT_URL,
       ext_endpoint: process.env.EXT_API_SERVER,
-      static_endpoint: process.env.STATIC_ENDPOINT_URL
+      static_endpoint: process.env.STATIC_ENDPOINT_URL,
+      app_update_channel_endpoint: process.env.APP_UPDATE_CHANNEL_ENDPOINT_URL,
     },
     notifications: {
       system: true
@@ -45,6 +47,7 @@ export default {
     [SET_API_ENDPOINT]: (s, state) => (s.api.endpoint = state),
     [SET_EXT_API_ENDPOINT]: (s, state) => (s.api.ext_endpoint = state),
     [SET_API_STATIC_ENDPOINT]: (s, state) => (s.api.static_endpoint = state),
+    [SET_APP_UPDATE_CHANNEL_ENDPOINT]: (s, state) => (s.api.app_update_channel_endpoint = state),
     /**
      * Set updates state
      *
@@ -138,6 +141,7 @@ export default {
     setAPIEndpoint: ({ commit }, state) => commit(SET_API_ENDPOINT, state),
     setExtAPIEndpoint: ({ commit }, state) => commit(SET_EXT_API_ENDPOINT, state),
     setAPIStaticEndpoint: ({ commit }, state) => commit(SET_API_STATIC_ENDPOINT, state),
+    setAppUpdateChannelEndpoint: ({ commit }, state) => commit(SET_APP_UPDATE_CHANNEL_ENDPOINT, state),
 
     /**
      * Set updates timeout

@@ -2,7 +2,7 @@
 
 ### Десктопный аниме-кинотеатр Анилибрии для любого вашего компьютера.
 
-![Anilibrix](https://github.com/A1ex3/anilibrix-plus/blob/lord/.github/assets/anilibrix.png?raw=true)
+![Anilibrix](https://raw.githubusercontent.com/A1ex3/anilibrix-plus/lord/.github/assets/anilibrix.png)
 
 ### Особенности не официальной версии (этой):
 * Вход через ВКонтакте
@@ -53,6 +53,7 @@
 * Убран круглый постер в пользу полного
 * Поддержка прокси (подробнее https://github.com/AnimeHaze/anilibrix-plus/releases/tag/v1.4.3-ext.11)
 * Добавлена страница "Расписание"
+* Добавлено обновление приложения
 
 #### Анилибрия — так звучит аниме!
 
