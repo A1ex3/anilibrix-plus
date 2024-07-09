@@ -129,16 +129,14 @@ jobs:
           updater_path=updater/build/updater.exe
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
 
-          GOARCH=amd64
-          cd updater && make build && cd ..
+          cd updater && make build-amd64 && cd ..
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i 's/"updater_hash_sha512": "",/"updater_hash_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
           npm run release:windows
           mv release/*-win-*-setup.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/win-unpacked ${{env.BUILD_DIR_TEMP}}/
 
-          GOARCH=arm64
-          cd updater && make build && cd ..
+          cd updater && make build-arm64 && cd ..
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i 's/"updater_hash_sha512": "",/"updater_hash_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
           npm run release:windows
