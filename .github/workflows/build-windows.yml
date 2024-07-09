@@ -150,8 +150,8 @@ jobs:
           find release -type f -regex '.*-win-[0-9]+\.[0-9]+\.[0-9]+\.exe' -exec mv {} ${{env.BUILD_DIR_TEMP}} \;
           mv release/*-win-ia32-*.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/*-win-x64-*.exe ${{env.BUILD_DIR_TEMP}}/
-          mv release/win-unpacked.zip ${{env.BUILD_DIR_TEMP}}/
-          mv release/win-ia32-unpacked.zip ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-win-arm64-*.exe ${{env.BUILD_DIR_TEMP}}/
+          mv release/win-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
