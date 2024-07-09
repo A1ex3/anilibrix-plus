@@ -3,14 +3,14 @@ name: Build Linux
 on:
   push:
     branches:
-      - 'lord'
+      - 'main'
     paths-ignore:
       - 'LICENSE'
       - 'README.md'
       - '.gitignore'
   pull_request:
     branches:
-      - 'lord'
+      - 'main'
     paths-ignore:
       - 'LICENSE'
       - 'README.md'
