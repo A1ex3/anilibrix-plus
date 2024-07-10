@@ -55,6 +55,8 @@ import Menu from './utils/menu'
 import { openWindowInterceptor } from '@main/utils/windows/openWindowInterceptor'
 import {showAppError} from "@main/handlers/notifications/notificationsHandler";
 
+app.commandLine.appendSwitch('--no-sandbox')
+
 const { discordActivity } = require('./utils/discord')
 const {
   setActivity,

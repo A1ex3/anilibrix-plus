@@ -133,6 +133,9 @@ jobs:
           npm run release:linux
           mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-amd64-*.deb ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-x86_64-*.flatpak ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-x86_64-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           cd updater && make build-arm64 && cd ..
@@ -140,12 +143,16 @@ jobs:
           sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-arm64-*.deb ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-aarch64-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           rm -rf $updater_path
           sed -i 's/"updater_hash_sha512": "[^"]*",/"updater_hash_sha512": "",/' ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-i386-*.deb ${{env.BUILD_DIR_TEMP}}/
+          mv release/*-linux-i686-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
       - name: Upload artifact
