@@ -33,7 +33,7 @@
     }
   },
   "build": {
-    "productName": "AniLibrixPlus",
+    "productName": "AniLibrix Plus",
     "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
     "appId": "com.anilibria.anilibrix",
     "directories": {
@@ -100,28 +100,6 @@
       "icon": "build/icons/app/anilibria.icns",
       "category": "Video",
       "target": [
-        {
-          "target": "flatpak",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "deb",
-          "arch": [
-            "x64",
-            "ia32",
-            "arm64"
-          ]
-        },
-        {
-          "target": "rpm",
-          "arch": [
-            "x64",
-            "ia32",
-            "arm64"
-          ]
-        },
         {
           "target": "AppImage",
           "arch": [
