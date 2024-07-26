@@ -4,12 +4,16 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </v-layout>
     <v-layout v-else column class="schedule">
-      <div v-for="(day, index) in data" :key="index" class="schedule-day">
-        <h2 :class="{ 'today': index === todayIndex }">{{ getDayLabel(day.day) }}</h2>
-        <v-slide-group show-arrows>
+      <v-tabs v-model="selectedDayIndex" centered>
+        <v-tab v-for="(day, index) in daysOfWeek" :key="index" :class="{ 'current-day': index === todayIndex }">
+          {{ day }}
+        </v-tab>
+      </v-tabs>
+      <div v-for="(day, index) in data" :key="index" class="slide-container">
+        <v-slide-group v-if="index === selectedDayIndex" show-arrows>
           <v-slide-item v-for="release in day.list" :key="release.id" class="mx-2">
-            <v-card class="schedule-card" v-bind="{release}" :ref="release.id" :key="release.id" @click="toRelease(release)">
-              <v-img :src="staticEndpointURL + release.posters.small.url" height="357.142px" class="schedule-image">
+            <v-card class="schedule-card" :ref="release.id" @click="toRelease(release)">
+              <v-img :src="staticEndpointURL + release.posters.small.url" class="schedule-image">
                 <div class="overlay">
                   <v-card-title class="title">{{ release.names.ru }}</v-card-title>
                   <v-card-subtitle class="subtitle">Эпизоды: {{ release.player.episodes.string }}</v-card-subtitle>
@@ -38,7 +42,9 @@ export default {
       data: [],
       loading: true,
       todayIndex: -1,
-      staticEndpointURL: ''
+      selectedDayIndex: 0, // Default to the first day of the week
+      staticEndpointURL: '',
+      daysOfWeek: ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
     };
   },
 
@@ -52,6 +58,9 @@ export default {
       let today = new Date().getDay(); // 0 (Sunday) to 6 (Saturday)
       this.todayIndex = today === 0 ? 6 : today - 1; // Adjust index for Sunday
 
+      // Set selectedDayIndex to today
+      this.selectedDayIndex = this.todayIndex;
+
       this.staticEndpointURL = require('@store/index').default?.state?.app?.settings?.system?.api?.static_endpoint;
     } catch (error) {
       console.error(error);
@@ -62,14 +71,6 @@ export default {
   },
 
   methods: {
-    getDayLabel(dayIndex) {
-      const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-      let dayLabel = daysOfWeek[dayIndex];
-      if (dayIndex === this.todayIndex) {
-        dayLabel += ' (сегодня)';
-      }
-      return dayLabel;
-    },
     toRelease
   },
 };
@@ -84,18 +85,6 @@ export default {
   margin-bottom: 40px;
 }
 
-.schedule-day h2 {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 0;
-  color: #525252;
-}
-
-.schedule-day h2.today {
-  color: #d3d3d3;
-}
-
 .schedule-card {
   width: 250px;
   margin: 0 auto;
@@ -107,6 +96,19 @@ export default {
 .schedule-image {
   object-fit: cover;
   transition: 0.3s ease;
+  height: calc(50vh - 200px); /* Adjust the formula as needed */
+}
+
+@media (max-height: 714px) {
+  .schedule-image {
+    height: 357.142px;
+  }
+}
+
+@media (min-height: 1000px) {
+  .schedule-image {
+    height: 500px;
+  }
 }
 
 .overlay {
@@ -145,13 +147,25 @@ export default {
   text-align: center;
 }
 
+.slide-container {
+  display: flex;
+  justify-content: center;
+  overflow: hidden; /* Ensure content does not overflow */
+}
+
 .v-slide-group {
   overflow: hidden; /* Ensure content does not overflow */
+  max-width: 100%; /* Prevents slide-group from exceeding viewport width */
 }
 
 .v-slide-item {
   display: inline-block;
   vertical-align: top;
   margin: 0 8px;
+}
+
+.current-day {
+  color: #f44336; /* Customize the color as needed */
+  font-weight: bold;
 }
 </style>

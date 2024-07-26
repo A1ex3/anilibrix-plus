@@ -3,7 +3,7 @@
 
     <v-card-text class="caption">
       <v-layout class="with-divider">
-        <div>Не официальная сборка {{ app.version }}</div>
+        <div>Неофициальная сборка {{ app.version }}</div>
         <a href="#" @click.prevent="sendAppAboutEvent">О приложении</a>
       </v-layout>
       <div>Весь материал в приложении представлен исключительно для домашнего ознакомительного просмотра.</div>

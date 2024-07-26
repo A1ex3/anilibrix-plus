@@ -129,7 +129,7 @@ jobs:
 
           cd updater && make build-amd64 && cd ..
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
@@ -137,13 +137,13 @@ jobs:
 
           cd updater && make build-arm64 && cd ..
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           rm -rf $updater_path
-          sed -i 's/"updater_hash_sha512": "[^"]*",/"updater_hash_sha512": "",/' ${{env.PACKAGE_FILE}}
+          sed -i 's/"updater_checksum_sha512": "[^"]*",/"updater_checksum_sha512": "",/' ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
