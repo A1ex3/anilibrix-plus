@@ -56,7 +56,7 @@
           outlined
           :value="_api_endpoint"
           @input="_setAPIEndpoint($event ? $event : process.env.API_ENDPOINT_URL)"
-          :items="['https://anilibria.tv', 'https://wwnd.space', 'https://anilibriaqt.anilib.top', 'https://anilibrix.anilib.top', 'https://anilibria.animehaze.me']"
+          :items="['https://anilibria.tv/', 'https://wwnd.space/', 'https://anilibriaqt.anilib.top/', 'https://anilibrix.anilib.top/', 'https://anilibria.animehaze.me/']"
           label="Точка подключения к API"
           persistent-hint
         />
@@ -66,7 +66,7 @@
           class="mb-2"
           :value="_ext_api_endpoint"
           @input="_setExtAPIEndpoint($event ? $event : process.env.EXT_API_SERVER)"
-          :items="['https://api.anilibria.tv', 'https://api.anilib.top']"
+          :items="['https://api.anilibria.tv/api/v1', 'https://api.anilib.top/api/v1']"
           label="Точка подключения к API (новые версии)"
           persistent-hint
         />

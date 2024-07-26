@@ -1,29 +1,46 @@
-GO := go
-BINARY_NAME := updater
-BUILD_PATH := build
+PROJECT-NAME := updater
+BUILD_DIR := build
+VENV-PATH := venv
+PYTHON-VENV-WIN := .\$(VENV-PATH)\Scripts\python
+PYTHON-VENV-LINUX := ./$(VENV-PATH)/bin/python3
+PIP-VENV-WIN := .\$(VENV-PATH)\Scripts\pip3
+PIP-VENV-LINUX := ./$(VENV-PATH)/bin/pip3
+VENV-BIN-PATH-WIN := .\$(VENV-PATH)\Scripts
+VENV-BIN-PATH-LINUX := ./$(VENV-PATH)/bin
+REQUIREMENTS-FILE := requirements.txt
+MAIN-FILE := main.py
 
 ifeq ($(OS),Windows_NT)
-	BINARY_NAME := $(BINARY_NAME).exe
-	BINARY_PATH := $(BUILD_PATH)/$(BINARY_NAME)
-	CLEAN := rd /s /q $(BUILD_PATH)
+    RMDIR := rmdir /s /q
+	RMFILE := del
+	SETUP-VENV := python -m venv $(VENV-PATH)
+	PIP-VENV := $(PIP-VENV-WIN)
+	PYTHON-VENV := $(PYTHON-VENV-WIN)
+	VENV-BIN-PATH := $(VENV-BIN-PATH-WIN)
 else
-	BINARY_NAME := $(BINARY_NAME)
-	BINARY_PATH := $(BUILD_PATH)/$(BINARY_NAME)
-	CLEAN := rm -rf $(BUILD_PATH)
+    RMDIR := rm -rf
+	RMFILE := rm -f
+	SETUP-VENV := python3 -m venv $(VENV-PATH)
+	PIP-VENV := $(PIP-VENV-LINUX)
+	PYTHON-VENV := $(PYTHON-VENV-LINUX)
+	VENV-BIN-PATH := $(VENV-BIN-PATH-LINUX)
 endif
+
+.PHONY: install
+install:
+	$(SETUP-VENV)
+	$(PIP-VENV) install -r $(REQUIREMENTS-FILE)
+
+.PHONY: update-requirements
+update-requirements:
+	$(PIP-VENV) freeze > $(REQUIREMENTS-FILE)
 
 .PHONY: build
 build:
-	$(GO) build -o $(BINARY_PATH)
-
-.PHONY: build-amd64
-build-amd64:
-	GOARCH=amd64 $(GO) build -o $(BINARY_PATH)
-
-.PHONY: build-arm64
-build-arm64:
-	GOARCH=arm64 $(GO) build -o $(BINARY_PATH)
+	$(VENV-BIN-PATH)/pyinstaller --onefile --noconsole --distpath $(BUILD_DIR) --name $(PROJECT-NAME) $(MAIN-FILE)
 
 .PHONY: clean
 clean:
-	$(CLEAN)
+	$(RMDIR) $(BUILD_DIR)
+	$(RMFILE) $(PROJECT-NAME).spec
+	$(RMDIR) $(VENV-PATH)
