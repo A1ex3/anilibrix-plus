@@ -38,7 +38,7 @@ update-requirements:
 
 .PHONY: build
 build:
-	$(PYINSTALLER-PATH) -D -F -n updater --noconsole "$(PROJECT-NAME)"
+	$(PYINSTALLER-PATH) -D -F -n $(PROJECT-NAME) -w -y "$(MAIN-FILE)"
 
 .PHONY: clean
 clean:
