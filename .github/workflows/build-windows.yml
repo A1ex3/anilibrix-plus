@@ -49,6 +49,11 @@ jobs:
         with:
             go-version: '1.21.x'
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
       - name: Install jq
         run: choco install jq
       - name: Check jq version
@@ -120,23 +125,25 @@ jobs:
         run: |
           npm install --global node-gyp@9.4.0
           yarn
+          cd updater/gui && make install && cd ../..
 
       - name: Run build
         shell: bash
         run: |
           mkdir -p ${{env.BUILD_DIR_TEMP}}
-
+          
+          mkdir -p updater/build/
           updater_path=updater/build/updater.exe
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
 
-          cd updater && make build-amd64 && cd ..
+          cd updater/gui && make build && cd ../.. && mv updater/gui/build/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:windows
           mv release/*-win-*-setup.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/win-unpacked ${{env.BUILD_DIR_TEMP}}/
 
-          cd updater && make build-arm64 && cd ..
+          cd updater/nogui && make build-arm64 && cd ../.. && mv updater/nogui/build/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i 's/"updater_checksum_sha512": "",/"updater_checksum_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
           npm run release:windows

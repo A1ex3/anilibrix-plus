@@ -50,6 +50,11 @@ jobs:
         with:
             go-version: '1.21.x'
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
       - name: Install jq
         run: sudo apt-get install jq -y
       - name: Check jq version
@@ -117,7 +122,9 @@ jobs:
           cat ${{ env.CHANGELOG_FILE }}.tmp
 
       - name: Install dependencies
-        run: yarn
+        run: |
+          yarn
+          cd updater/gui && make install && cd ../..
 
       - name: Run build
         shell: bash
@@ -127,7 +134,7 @@ jobs:
           updater_path=updater/build/updater
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
 
-          cd updater && make build-amd64 && cd ..
+          cd updater/gui && make build && cd ../.. && mv updater/gui/build/updater $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
@@ -135,7 +142,7 @@ jobs:
           mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
 
-          cd updater && make build-arm64 && cd ..
+          cd updater/nogui && make build-arm64 && cd ../.. && mv updater/nogui/build/updater $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
