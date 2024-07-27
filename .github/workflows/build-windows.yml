@@ -138,19 +138,19 @@ jobs:
           cd updater/gui && make build && cd ../.. && mv updater/gui/dist/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          npm run release:windows
+          yarn release:windows
           mv release/*-win-*-setup.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/win-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           cd updater/nogui && make build-arm64 && cd ../.. && mv updater/nogui/build/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i 's/"updater_checksum_sha512": "",/"updater_checksum_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
-          npm run release:windows
+          yarn release:windows
           mv release/win-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           rm -rf $updater_path
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          npm run release:windows
+          yarn release:windows
           find release -type f -regex '.*-win-[0-9]+\.[0-9]+\.[0-9]+\.exe' -exec mv {} ${{env.BUILD_DIR_TEMP}} \;
           mv release/*-win-ia32-*.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/*-win-x64-*.exe ${{env.BUILD_DIR_TEMP}}/
