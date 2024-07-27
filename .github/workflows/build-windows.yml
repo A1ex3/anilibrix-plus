@@ -154,7 +154,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Save artifacts
+          name: Anilibrix Plus
           path: ${{env.BUILD_DIR_TEMP}}/*
 
       - name: Archiving binary files
@@ -170,6 +170,7 @@ jobs:
           Remove-Item -Path "win-ia32-unpacked" -Recurse -Force
 
       - name: Create Release
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GH_TOKEN }}

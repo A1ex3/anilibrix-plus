@@ -81,12 +81,9 @@ export default {
   padding: 20px;
 }
 
-.schedule-day {
-  margin-bottom: 40px;
-}
-
 .schedule-card {
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
   margin: 0 auto;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   position: relative;
@@ -96,19 +93,10 @@ export default {
 .schedule-image {
   object-fit: cover;
   transition: 0.3s ease;
-  height: calc(50vh - 200px); /* Adjust the formula as needed */
-}
-
-@media (max-height: 714px) {
-  .schedule-image {
-    height: 357.142px;
-  }
-}
-
-@media (min-height: 1000px) {
-  .schedule-image {
-    height: 500px;
-  }
+  height: calc(35vh + 150px); /* Adjusting height to be responsive within the range */
+  min-height: 350px; /* Minimum height */
+  max-height: 500px; /* Maximum height */
+  width: 100%;
 }
 
 .overlay {
@@ -150,22 +138,24 @@ export default {
 .slide-container {
   display: flex;
   justify-content: center;
-  overflow: hidden; /* Ensure content does not overflow */
+  overflow: hidden;
 }
 
 .v-slide-group {
-  overflow: hidden; /* Ensure content does not overflow */
-  max-width: 100%; /* Prevents slide-group from exceeding viewport width */
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .v-slide-item {
   display: inline-block;
   vertical-align: top;
   margin: 0 8px;
+  width: 100%;
+  max-width: 250px;
 }
 
 .current-day {
-  color: #f44336; /* Customize the color as needed */
+  color: #f44336;
   font-weight: bold;
 }
 </style>
