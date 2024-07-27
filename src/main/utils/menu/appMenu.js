@@ -8,10 +8,6 @@ export const aboutTemplate = [
     label: 'О приложении'
   },
   {
-    label: 'Telegram-канал',
-    click: () => shell.openExternal(meta.links.telegram)
-  },
-  {
     label: 'Исходный код на GitHub',
     click: () => shell.openExternal(repository.url)
   },
@@ -21,10 +17,6 @@ export const aboutTemplate = [
   {
     label: 'Анилибрия',
     click: () => shell.openExternal(meta.links.anilibria)
-  },
-  {
-    label: 'Поддержать проект',
-    click: () => shell.openExternal(meta.links.donate)
   },
   {
     type: 'separator'

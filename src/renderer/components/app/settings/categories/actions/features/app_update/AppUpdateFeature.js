@@ -91,7 +91,7 @@ export default class AppUpdateFeature{
             const hash = crypto.createHash('sha512');
             hash.update(data);
             const sha512 = hash.digest('hex');
-            const updaterHash = require('@package').updater_hash_sha512
+            const updaterHash = require('@package').updater_checksum_sha512
 
             console.log(`Expected hash of the updater program (sha512): ${updaterHash}, got (sha512): ${sha512}`)
 

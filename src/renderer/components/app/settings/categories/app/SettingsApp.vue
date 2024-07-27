@@ -37,20 +37,6 @@ export default {
           action: () => require('@electron/remote').shell.openExternal(meta.links.anilibria),
         },
         {
-          title: 'Поддержать проект',
-          value: 'Яндекс.Деньги, QIWI, PayPal',
-          action: () => require('@electron/remote').shell.openExternal(meta.links.donate)
-        },
-        {
-          title: 'Telegram-канал не официальных релизов',
-          action: () => require('@electron/remote').shell.openExternal(meta.links.unofficial)
-        },
-        {
-          title: 'Telegram-канал',
-          value: '@anilibrix',
-          action: () => require('@electron/remote').shell.openExternal(meta.links.telegram)
-        },
-        {
           title: 'Исходный код',
           value: '/anilibrix',
           action: () => require('@electron/remote').shell.openExternal(repository.url)
