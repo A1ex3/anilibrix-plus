@@ -1,12 +1,11 @@
 PROJECT-NAME := updater
-BUILD_DIR := build
 VENV-PATH := venv
-PYTHON-VENV-WIN := .\$(VENV-PATH)\Scripts\python
-PYTHON-VENV-LINUX := ./$(VENV-PATH)/bin/python3
-PIP-VENV-WIN := .\$(VENV-PATH)\Scripts\pip3
-PIP-VENV-LINUX := ./$(VENV-PATH)/bin/pip3
 VENV-BIN-PATH-WIN := .\$(VENV-PATH)\Scripts
 VENV-BIN-PATH-LINUX := ./$(VENV-PATH)/bin
+PYTHON-VENV-WIN := $(VENV-BIN-PATH-WIN)\python
+PYTHON-VENV-LINUX := $(VENV-BIN-PATH-LINUX)/python3
+PIP-VENV-WIN := $(VENV-BIN-PATH-WIN)\pip3
+PIP-VENV-LINUX := $(VENV-BIN-PATH-LINUX)/pip3
 REQUIREMENTS-FILE := requirements.txt
 MAIN-FILE := main.py
 
@@ -17,6 +16,7 @@ ifeq ($(OS),Windows_NT)
 	PIP-VENV := $(PIP-VENV-WIN)
 	PYTHON-VENV := $(PYTHON-VENV-WIN)
 	VENV-BIN-PATH := $(VENV-BIN-PATH-WIN)
+	PYINSTALLER-PATH := $(VENV-BIN-PATH)\pyinstaller
 else
     RMDIR := rm -rf
 	RMFILE := rm -f
@@ -24,6 +24,7 @@ else
 	PIP-VENV := $(PIP-VENV-LINUX)
 	PYTHON-VENV := $(PYTHON-VENV-LINUX)
 	VENV-BIN-PATH := $(VENV-BIN-PATH-LINUX)
+	PYINSTALLER-PATH := $(VENV-BIN-PATH)/pyinstaller
 endif
 
 .PHONY: install
@@ -37,10 +38,11 @@ update-requirements:
 
 .PHONY: build
 build:
-	$(VENV-BIN-PATH)/pyinstaller --onefile --noconsole --distpath $(BUILD_DIR) --name $(PROJECT-NAME) $(MAIN-FILE)
+	$(PYINSTALLER-PATH) -D -F -n updater --noconsole "$(PROJECT-NAME)"
 
 .PHONY: clean
 clean:
-	$(RMDIR) $(BUILD_DIR)
+	$(RMDIR) dist
+	$(RMDIR) build
 	$(RMFILE) $(PROJECT-NAME).spec
 	$(RMDIR) $(VENV-PATH)

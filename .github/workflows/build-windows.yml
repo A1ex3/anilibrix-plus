@@ -136,7 +136,7 @@ jobs:
           updater_path=updater/build/updater.exe
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
 
-          cd updater/gui && make build && cd ../.. && mv updater/gui/build/updater.exe $updater_path
+          cd updater/gui && make build && cd ../.. && mv updater/gui/dist/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:windows
