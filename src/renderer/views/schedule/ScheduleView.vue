@@ -82,7 +82,7 @@ export default {
 }
 
 .schedule-card {
-  width: 100%;
+  width: 250px; 
   max-width: 250px;
   margin: 0 auto;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
