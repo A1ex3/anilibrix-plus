@@ -1,11 +1,11 @@
 {
   "name": "anilibrix",
-  "version": "v1.6.1",
-  "updater_hash_sha512": "",
+  "version": "v1.6.2",
+  "updater_checksum_sha512": "",
   "author": {
     "name": "Anilibria",
     "email": "anilibria@protonmail.com",
-    "url": "https://anilibria.tv"
+    "url": "https://anilibria.top"
   },
   "description": "AniLibrix Plus - AniLibria desktop app (Anilibrix fork)",
   "license": "MIT",
@@ -27,9 +27,7 @@
     "name": "AniLibrix",
     "links": {
       "github": "https://github.com/A1ex3/anilibrix-plus",
-      "donate": "https://www.anilibria.tv/pages/donate.php",
-      "telegram": "tg://resolve?domain=anilibrix",
-      "anilibria": "https://anilibria.tv"
+      "anilibria": "https://anilibria.top"
     }
   },
   "build": {

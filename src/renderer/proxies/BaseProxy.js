@@ -66,7 +66,7 @@ export default class BaseProxy {
    * @return {string}
    */
   getApiEndpointExtend (api_version = "v1") {
-    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint.replace("v1", api_version)
+    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint + `/api/${api_version}`
     console.log('Extend endpoint', endpoint)
     return endpoint
   }

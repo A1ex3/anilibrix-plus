@@ -49,6 +49,11 @@ jobs:
         with:
             go-version: '1.21.x'
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Install jq
         run: choco install jq
       - name: Check jq version
@@ -62,7 +67,7 @@ jobs:
       - name: patch node gyp on windows to support Visual Studio 2019
         shell: powershell
         run: |
-          npm install --global node-gyp@latest
+          npm install --global node-gyp@9.4.0
           npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
       - name: Get yarn cache
@@ -118,33 +123,34 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install --global node-gyp@9.4.0
           yarn
+          cd updater/gui && make install && cd ../..
 
       - name: Run build
         shell: bash
         run: |
           mkdir -p ${{env.BUILD_DIR_TEMP}}
+          mkdir -p updater/build/
 
           updater_path=updater/build/updater.exe
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
 
-          cd updater && make build-amd64 && cd ..
+          cd updater/gui && make build && cd ../.. && mv updater/gui/dist/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          npm run release:windows
+          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          yarn release:windows
           mv release/*-win-*-setup.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/win-unpacked ${{env.BUILD_DIR_TEMP}}/
 
-          cd updater && make build-arm64 && cd ..
+          cd updater/nogui && make build-arm64 && cd ../.. && mv updater/nogui/build/updater.exe $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i 's/"updater_hash_sha512": "",/"updater_hash_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
-          npm run release:windows
+          sed -i 's/"updater_checksum_sha512": "",/"updater_checksum_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
+          yarn release:windows
           mv release/win-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           rm -rf $updater_path
-          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          npm run release:windows
+          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          yarn release:windows
           find release -type f -regex '.*-win-[0-9]+\.[0-9]+\.[0-9]+\.exe' -exec mv {} ${{env.BUILD_DIR_TEMP}} \;
           mv release/*-win-ia32-*.exe ${{env.BUILD_DIR_TEMP}}/
           mv release/*-win-x64-*.exe ${{env.BUILD_DIR_TEMP}}/
@@ -154,7 +160,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Save artifacts
+          name: Anilibrix Plus
           path: ${{env.BUILD_DIR_TEMP}}/*
 
       - name: Archiving binary files
@@ -170,6 +176,7 @@ jobs:
           Remove-Item -Path "win-ia32-unpacked" -Recurse -Force
 
       - name: Create Release
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GH_TOKEN }}

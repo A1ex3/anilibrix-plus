@@ -50,6 +50,11 @@ jobs:
         with:
             go-version: '1.21.x'
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Install jq
         run: sudo apt-get install jq -y
       - name: Check jq version
@@ -117,33 +122,37 @@ jobs:
           cat ${{ env.CHANGELOG_FILE }}.tmp
 
       - name: Install dependencies
-        run: yarn
+        run: |
+          yarn
+          sudo apt-get -y install libxcb-icccm4 libxcb-render-util0 libxkbcommon-x11-0 libxcb-image0 libxcb-cursor0 libxcb-shape0 libxcb-xkb1 libxcb-keysyms1 libgl1-mesa-glx
+          cd updater/gui && make install && cd ../..
 
       - name: Run build
         shell: bash
         run: |
           mkdir -p ${{env.BUILD_DIR_TEMP}}
+          mkdir -p updater/build/
 
           updater_path=updater/build/updater
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
 
-          cd updater && make build-amd64 && cd ..
+          cd updater/gui && make build && cd ../.. && mv updater/gui/dist/updater $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
 
-          cd updater && make build-arm64 && cd ..
+          cd updater/nogui && make build-arm64 && cd ../.. && mv updater/nogui/build/updater $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_hash_sha512\": \"\",/\"updater_hash_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
+          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
           rm -rf $updater_path
-          sed -i 's/"updater_hash_sha512": "[^"]*",/"updater_hash_sha512": "",/' ${{env.PACKAGE_FILE}}
+          sed -i 's/"updater_checksum_sha512": "[^"]*",/"updater_checksum_sha512": "",/' ${{env.PACKAGE_FILE}}
           npm run release:linux
           mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
@@ -151,7 +160,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Save artifacts
+          name: Anilibrix Plus
           path: ${{env.BUILD_DIR_TEMP}}/*
 
       - name: Archiving binary files
@@ -164,6 +173,7 @@ jobs:
           rm -rf linux-arm64-unpacked linux-unpacked linux-ia32-unpacked
 
       - name: Create Release
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
