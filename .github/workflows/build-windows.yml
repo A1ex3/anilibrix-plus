@@ -67,7 +67,7 @@ jobs:
       - name: patch node gyp on windows to support Visual Studio 2019
         shell: powershell
         run: |
-          npm install --global node-gyp@latest
+          npm install --global node-gyp@9.4.0
           npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
       - name: Get yarn cache
@@ -123,7 +123,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install --global node-gyp@9.4.0
           yarn
           cd updater/gui && make install && cd ../..
 
@@ -131,8 +130,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p ${{env.BUILD_DIR_TEMP}}
-          
           mkdir -p updater/build/
+
           updater_path=updater/build/updater.exe
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
 

@@ -131,6 +131,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ${{env.BUILD_DIR_TEMP}}
+          mkdir -p updater/build/
 
           updater_path=updater/build/updater
           sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
