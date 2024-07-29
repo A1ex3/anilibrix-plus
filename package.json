@@ -1,6 +1,6 @@
 {
   "name": "anilibrix",
-  "version": "v1.6.2",
+  "version": "v1.6.3",
   "updater_checksum_sha512": "",
   "author": {
     "name": "Anilibria",
@@ -98,6 +98,22 @@
       "icon": "build/icons/app/anilibria.icns",
       "category": "Video",
       "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
         {
           "target": "AppImage",
           "arch": [
