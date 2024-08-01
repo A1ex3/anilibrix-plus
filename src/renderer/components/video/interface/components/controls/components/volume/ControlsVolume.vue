@@ -2,7 +2,7 @@
   <v-layout align-center class="shrink">
 
     <!-- Volume Mute -->
-    <v-btn icon large @click="$emit('change', 0)">
+    <v-btn icon large @click="toggleMute">
       <v-icon size="24">mdi-volume-{{ getVolumeState }}</v-icon>
     </v-btn>
 
@@ -14,7 +14,7 @@
       step=".05"
       :value="volume"
       :style="{maxWidth: '70px', width: '70px'}"
-      @input="$emit('change', $event)">
+      @input="changeVolume($event)">
     </v-slider>
 
   </v-layout>
@@ -34,6 +34,7 @@ export default {
   data () {
     return {
       volume: .5,
+      previousVolume: .5,
     }
   },
   computed: {
@@ -52,16 +53,29 @@ export default {
 
   },
 
-  mounted () {
+  methods: {
+    toggleMute() {
+      if (this.volume > 0) {
+        this.previousVolume = this.volume;
+        this.changeVolume(0);
+      } else {
+        this.changeVolume(this.previousVolume);
+      }
+    },
+    changeVolume(value) {
+      this.volume = value;
+      this.$emit('change', value);
+    }
+  },
 
+  mounted () {
     // Set initial values
-    this.volume = this.player.volume
+    this.volume = this.player.volume;
+    this.previousVolume = this.player.volume;
 
     // Watch for player volume change
     // Update player interface
-    this.player.on('volumechange', e => this.volume = this.player.volume)
-
+    this.player.on('volumechange', e => this.volume = this.player.volume);
   },
-
 }
 </script>

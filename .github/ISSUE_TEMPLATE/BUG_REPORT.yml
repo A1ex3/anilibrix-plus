@@ -1,0 +1,59 @@
+name: Bug report
+description: Report errors or unexpected behavior.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting issues of Anilibrix Plus!
+
+        Please enter detailed information below.
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behaviour
+      placeholder: Tell us what should happen
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual behaviour
+      placeholder: Tell us what happens instead
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating system
+      description: >
+        Your operating system name, version, architecture and desktop environment.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Version of Anilibrix Plus
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Installation source
+      multiple: false
+      options:
+        - Setup
+        - Rpm
+        - Deb
+        - Snap
+        - AppImage
+        - Dmg
+        - Unpacked
+        - Single file (Windows only)
+        - Other
+    validations:
+      required: true

@@ -240,7 +240,7 @@ export const handleRand = () => {
     const ext_endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint
 
     try {
-      const { data } = await axios.get(`${ext_endpoint.replace("v1", "v3")}/title/random`)
+      const { data } = await axios.get(`${ext_endpoint}/v3/title/random`)
       console.log('Rand:', data.id)
       return { id: data.id, name: data.names.en }
     } catch (e) {
