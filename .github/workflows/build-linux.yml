@@ -10,8 +10,7 @@ on:
       - '.gitignore'
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - 'updater/gui/.gitignore'
-      - 'updater/nogui/.gitignore'
+      - 'updater/README.md'
   pull_request:
     branches:
       - 'main'
@@ -21,14 +20,13 @@ on:
       - '.gitignore'
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - 'updater/gui/.gitignore'
-      - 'updater/nogui/.gitignore'
+      - 'updater/README.md'
 
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
-  CHANGELOG_FILE: changelog.txt
   BUILD_DIR_TEMP: build_temp
+  UPDATER_VERSION: v0.0.1
 
 jobs:
   release:
@@ -52,16 +50,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Setup Go 1.21.x
-        uses: actions/setup-go@v4
-        with:
-            go-version: '1.21.x'
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
 
       - name: Install jq
         run: sudo apt-get install jq -y
@@ -122,15 +110,13 @@ jobs:
         shell: bash
         run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
 
-      - name: Get Change log
+      - name: Install dependencies
         shell: bash
         run: |
-          sudo chmod +x .ci/get_changelog.sh
-          ./.ci/get_changelog.sh ${{env.CHANGELOG_FILE}} ${{env.APP_VERSION}} > ${{ env.CHANGELOG_FILE }}.tmp
-          cat ${{ env.CHANGELOG_FILE }}.tmp
+          sudo chmod +x third-party/updater/download.sh
+          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-x64 && cd third-party/updater/downloads && tar -xzvf linux-x64.tar.gz && cd ../../..
+          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-arm64 && cd third-party/updater/downloads && tar -xzvf linux-arm64.tar.gz && cd ../../..
 
-      - name: Install dependencies
-        run: |
           yarn
           sudo apt-get -y install \
           libxcb-icccm4 \
@@ -143,33 +129,30 @@ jobs:
           libxcb-keysyms1 \
           libgl1-mesa-glx \
           rpm
-          cd updater/gui && make install && cd ../..
 
       - name: Run build
         shell: bash
         run: |
           mkdir -p ${{env.BUILD_DIR_TEMP}}
-          mkdir -p updater/build/
+          mkdir -p third-party/updater/build/
 
-          updater_path=updater/build/updater
-          sed -i 's/"from": "path\/to\/updater_file"/"from": "updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
+          updater_path=third-party/updater/build/updater
+          sed -i 's/"from": "path\/to\/updater_file"/"from": "third-party\/updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
 
-          cd updater/gui && make build && cd ../.. && mv updater/gui/dist/updater $updater_path
+          mv third-party/updater/downloads/linux-x64/updater $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           yarn release:linux
           mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-amd64-*.deb ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
 
-          cd updater/nogui && make build-arm64 && cd ../.. && mv updater/nogui/build/updater $updater_path
+          mv third-party/updater/downloads/linux-arm64/updater $updater_path
           hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           yarn release:linux
           mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-arm64-*.deb ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-aarch64-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
@@ -177,7 +160,6 @@ jobs:
           sed -i 's/"updater_checksum_sha512": "[^"]*",/"updater_checksum_sha512": "",/' ${{env.PACKAGE_FILE}}
           yarn release:linux
           mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-i386-*.deb ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-i686-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
@@ -201,6 +183,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
-          body_path: ${{ env.CHANGELOG_FILE }}.tmp
           tag_name: ${{env.APP_VERSION}}
           files: ${{env.BUILD_DIR_TEMP}}/*
