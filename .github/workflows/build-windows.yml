@@ -10,8 +10,7 @@ on:
       - '.gitignore'
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - 'updater/gui/.gitignore'
-      - 'updater/nogui/.gitignore'
+      - 'updater/README.md'
   pull_request:
     branches:
       - 'main'
@@ -21,8 +20,7 @@ on:
       - '.gitignore'
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - 'updater/gui/.gitignore'
-      - 'updater/nogui/.gitignore'
+      - 'updater/README.md'
 
 env:
   ENV_EXAMPLE_FILE: .env.example

@@ -1,28 +1,26 @@
 name: Release
 
 on:
-    push:
-      branches:
-        - 'main'
-      paths-ignore:
-        - 'LICENSE'
-        - 'README.md'
-        - '.gitignore'
-        - '.github/assets/**'
-        - '.github/ISSUE_TEMPLATE/**'
-        - 'updater/gui/.gitignore'
-        - 'updater/nogui/.gitignore'
-    pull_request:
-      branches:
-        - 'main'
-      paths-ignore:
-        - 'LICENSE'
-        - 'README.md'
-        - '.gitignore'
-        - '.github/assets/**'
-        - '.github/ISSUE_TEMPLATE/**'
-        - 'updater/gui/.gitignore'
-        - 'updater/nogui/.gitignore'
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - 'LICENSE'
+      - 'README.md'
+      - '.gitignore'
+      - '.github/assets/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - 'updater/README.md'
+  pull_request:
+    branches:
+      - 'main'
+    paths-ignore:
+      - 'LICENSE'
+      - 'README.md'
+      - '.gitignore'
+      - '.github/assets/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - 'updater/README.md'
 
 env:
   PACKAGE_FILE: package.json
