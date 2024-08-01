@@ -5,7 +5,7 @@
 chmod +x updater/download.sh
 ```
 ```bash
-./updater/download.sh <UPDATER_VERSION>
+./updater/download.sh <UPDATER_VERSION> <OS_ARCHITECTURE>
 ```
 
 ## Or download from the repository directly (https://github.com/A1ex3/anilibrix-plus-updater/releases).
