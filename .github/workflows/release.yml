@@ -1,0 +1,60 @@
+name: Release
+
+on:
+    push:
+      branches:
+        - 'main'
+      paths-ignore:
+        - 'LICENSE'
+        - 'README.md'
+        - '.gitignore'
+        - '.github/assets/**'
+        - '.github/ISSUE_TEMPLATE/**'
+        - 'updater/gui/.gitignore'
+        - 'updater/nogui/.gitignore'
+    pull_request:
+      branches:
+        - 'main'
+      paths-ignore:
+        - 'LICENSE'
+        - 'README.md'
+        - '.gitignore'
+        - '.github/assets/**'
+        - '.github/ISSUE_TEMPLATE/**'
+        - 'updater/gui/.gitignore'
+        - 'updater/nogui/.gitignore'
+
+env:
+  PACKAGE_FILE: package.json
+  CHANGELOG_FILE: changelog.txt
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Check out Git repository
+          uses: actions/checkout@v1
+
+        - name: Install jq
+          run: sudo apt-get install jq -y
+        - name: Check jq version
+          run: jq --version
+
+        - name: Get the application version from the "package.json" file
+          shell: bash
+          run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
+
+        - name: Get Change log
+          shell: bash
+          run: |
+            sudo chmod +x .ci/get_changelog.sh
+            ./.ci/get_changelog.sh ${{env.CHANGELOG_FILE}} ${{env.APP_VERSION}} > ${{ env.CHANGELOG_FILE }}.tmp
+            cat ${{ env.CHANGELOG_FILE }}.tmp
+
+        - name: Create Release
+          if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+          uses: softprops/action-gh-release@v2
+          with:
+            token: ${{ secrets.GH_TOKEN }}
+            body_path: ${{ env.CHANGELOG_FILE }}.tmp
+            tag_name: ${{env.APP_VERSION}}

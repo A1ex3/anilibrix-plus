@@ -27,7 +27,6 @@ on:
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
-  CHANGELOG_FILE: changelog.txt
   BUILD_DIR_TEMP: build_temp
 
 jobs:
@@ -122,13 +121,6 @@ jobs:
         shell: bash
         run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
 
-      - name: Get Change log
-        shell: bash
-        run: |
-          sudo chmod +x .ci/get_changelog.sh
-          ./.ci/get_changelog.sh ${{env.CHANGELOG_FILE}} ${{env.APP_VERSION}} > ${{ env.CHANGELOG_FILE }}.tmp
-          cat ${{ env.CHANGELOG_FILE }}.tmp
-
       - name: Install dependencies
         run: |
           yarn
@@ -160,7 +152,6 @@ jobs:
           yarn release:linux
           mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-amd64-*.deb ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-x86_64-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
 
@@ -169,7 +160,6 @@ jobs:
           sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
           yarn release:linux
           mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-arm64-*.deb ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-aarch64-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
 
@@ -177,7 +167,6 @@ jobs:
           sed -i 's/"updater_checksum_sha512": "[^"]*",/"updater_checksum_sha512": "",/' ${{env.PACKAGE_FILE}}
           yarn release:linux
           mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-i386-*.deb ${{env.BUILD_DIR_TEMP}}/
           mv release/*-linux-i686-*.rpm ${{env.BUILD_DIR_TEMP}}/
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
@@ -201,6 +190,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
-          body_path: ${{ env.CHANGELOG_FILE }}.tmp
           tag_name: ${{env.APP_VERSION}}
           files: ${{env.BUILD_DIR_TEMP}}/*
