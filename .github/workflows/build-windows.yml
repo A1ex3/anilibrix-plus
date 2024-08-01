@@ -123,7 +123,7 @@ jobs:
         run: |
           chmod +x third-party/updater/download.sh
           ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} windows-x64 && cd third-party/updater/downloads && tar -xzvf windows-x64.tar.gz && cd ../../..
-          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} windows-arm64 cd third-party/updater/downloads && tar -xzvf windows-arm64.tar.gz && cd ../../..
+          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} windows-arm64 && cd third-party/updater/downloads && tar -xzvf windows-arm64.tar.gz && cd ../../..
       
           yarn
 

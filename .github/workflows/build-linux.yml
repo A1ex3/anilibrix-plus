@@ -115,7 +115,7 @@ jobs:
         run: |
           sudo chmod +x third-party/updater/download.sh
           ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-x64 && cd third-party/updater/downloads && tar -xzvf linux-x64.tar.gz && cd ../../..
-          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-arm64 cd third-party/updater/downloads && tar -xzvf linux-arm64.tar.gz && cd ../../..
+          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-arm64 && cd third-party/updater/downloads && tar -xzvf linux-arm64.tar.gz && cd ../../..
 
           yarn
           sudo apt-get -y install \
