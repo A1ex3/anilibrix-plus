@@ -35,8 +35,6 @@ env:
 
 jobs:
   release:
-    if: ${{ startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/dev') }}
-
     permissions: write-all
     runs-on: ${{ matrix.os }}
 
