@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     controlsRight () {
-      return !!(this.appbarRight || this.isWindows);
+      return !!(this.appbarRight || this.isWindows || this.isLinux);
     },
     /**
      * Get controls

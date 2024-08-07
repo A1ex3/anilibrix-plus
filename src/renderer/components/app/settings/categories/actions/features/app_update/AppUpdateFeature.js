@@ -129,7 +129,7 @@ export default class AppUpdateFeature{
         if (operationSystem === null || architectureSystem === null) {
             return false;
         } else {
-            // Formats the application version into a number. Example: "v1.2.3" -> "123"
+            // Formats the application version into a number. Example: "v1.2.3" -> 123
             const currentAppVersionNumber = parseInt(currentAppVersion.substring(1).replace(/\./g, ''));
             const availableAppVersionNumber = parseInt(releaseData['latest_version'].substring(1).replace(/\./g, ''));
             
