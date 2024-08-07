@@ -21,6 +21,13 @@ on:
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
       - 'updater/README.md'
+  
+  workflow_dispatch:
+    inputs:
+      artifact_upload:
+        description: 'Artifact uploading'
+        required: false
+        type: boolean
 
 env:
   ENV_EXAMPLE_FILE: .env.example
@@ -30,6 +37,8 @@ env:
 
 jobs:
   release:
+    if: ${{ startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/dev') }}
+
     permissions: write-all
     runs-on: ${{ matrix.os }}
 
@@ -164,12 +173,14 @@ jobs:
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
       - name: Upload artifact
+        if: ${{ inputs.artifact_upload == true }}
         uses: actions/upload-artifact@v3
         with:
           name: Anilibrix Plus
           path: ${{env.BUILD_DIR_TEMP}}/*
 
       - name: Archiving binary files
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         run: |
           cd ${{env.BUILD_DIR_TEMP}}
           zip -r linux-arm64-unpacked.zip linux-arm64-unpacked
