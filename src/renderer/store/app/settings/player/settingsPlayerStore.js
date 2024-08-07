@@ -29,7 +29,7 @@ export default {
       skip_time: 30,
       skip_button: false,
       skip_button_key: '',
-      autoSkip: false,
+      autoSkip: true,
       autoSkipKey: ''
     },
     video: {
