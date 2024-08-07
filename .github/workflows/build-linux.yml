@@ -173,7 +173,7 @@ jobs:
           mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
 
       - name: Upload artifact
-        if: ${{ inputs.artifact_upload == true }}
+        if: ${{ inputs.artifact_upload == true || startsWith(github.ref, 'refs/heads/main')}}
         uses: actions/upload-artifact@v3
         with:
           name: Anilibrix Plus
