@@ -35,6 +35,15 @@ export default {
     },
 
     /**
+     * Check if linux os
+     *
+     * @return {boolean}
+     */    
+    isLinux(){
+      return process.platform === 'linux'
+    },
+
+    /**
      * Is mac and on fullscreen
      *
      * @return {boolean}
