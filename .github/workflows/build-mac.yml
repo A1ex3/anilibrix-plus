@@ -22,12 +22,21 @@ on:
       - '.github/ISSUE_TEMPLATE/**'
       - 'updater/README.md'
 
+  workflow_dispatch:
+    inputs:
+      artifact_upload:
+        description: 'Artifact uploading'
+        required: false
+        type: boolean
+
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
 
 jobs:
   release:
+    if: ${{ startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/dev') }}
+
     permissions: write-all
     runs-on: ${{ matrix.os }}
 
@@ -120,6 +129,7 @@ jobs:
         run: npm run release:mac
 
       - name: Upload artifact
+        if: ${{ inputs.artifact_upload == true || startsWith(github.ref, 'refs/heads/main')}}
         uses: actions/upload-artifact@v3
         with:
           name: Anilibrix Plus
