@@ -83,28 +83,38 @@
 cp .env.example .env
 ```
 
-``` bash
-# Установка и сборка зависимостей
-yarn install
+## Установка и сборка зависимостей
+### Linux
+```bash
+chmod +x configure.sh
+```
+```bash
+./configure.sh
+```
+### Windows
+```powershell
+./configure.ps1
+```
 
-# Запуск с горячей перезагрузкой на localhost:9080
+## Запуск с горячей перезагрузкой на localhost:9080
+```bash
 yarn run serve
+```
 
-# Сборка production версии
-yarn run build
+## Сборка под Windows и Linux
+### Linux
+```bash
+chmod +x build.sh
+```
+```bash
+./build.sh
+```
+### Windows
+```powershell
+./build.ps1
+```
 
-# Запуск ESLint --fix для JS/Vue файлов и компонентов в `src/`
-yarn run lint:fix
-
-# Сборка под все платформы
-yarn run release
-
-# Сборка под MacOS
+### Сборка под MacOS
+```bash
 yarn run release:mac
-
-# Сборка под Windows
-yarn run release:win
-
-# Сборка под Linux
-yarn run release:lin
 ```

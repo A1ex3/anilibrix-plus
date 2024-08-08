@@ -32,8 +32,7 @@ on:
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
-  BUILD_DIR_TEMP: build_temp
-  UPDATER_VERSION: v0.0.1
+  OUT_DIR: out
 
 jobs:
   release:
@@ -58,6 +57,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Install jq
         run: sudo apt-get install jq -y
       - name: Check jq version
@@ -74,9 +78,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-
-      - name: Install multilib
-        run: sudo apt-get -y install gcc-multilib g++-multilib
 
       - name: Cache Electron
         uses: actions/cache@v1
@@ -120,67 +121,26 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          sudo chmod +x third-party/updater/download.sh
-          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-x64 && cd third-party/updater/downloads && tar -xzvf linux-x64.tar.gz && cd ../../..
-          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} linux-arm64 && cd third-party/updater/downloads && tar -xzvf linux-arm64.tar.gz && cd ../../..
-
-          yarn
-          sudo apt-get -y install \
-          libxcb-icccm4 \
-          libxcb-render-util0 \
-          libxkbcommon-x11-0 \
-          libxcb-image0 \
-          libxcb-cursor0 \
-          libxcb-shape0 \
-          libxcb-xkb1 \
-          libxcb-keysyms1 \
-          libgl1-mesa-glx \
-          rpm
+          sudo chmod +x configure.sh
+          ./configure.sh
 
       - name: Run build
         shell: bash
         run: |
-          mkdir -p ${{env.BUILD_DIR_TEMP}}
-          mkdir -p third-party/updater/build/
-
-          updater_path=third-party/updater/build/updater
-          sed -i 's/"from": "path\/to\/updater_file"/"from": "third-party\/updater\/build\/updater"/g' ${{env.PACKAGE_FILE}}
-
-          mv third-party/updater/downloads/linux-x64/updater $updater_path
-          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          yarn release:linux
-          mv release/*-linux-amd64-*.snap ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-x86_64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-x86_64-*.rpm ${{env.BUILD_DIR_TEMP}}/
-          mv release/linux-unpacked ${{env.BUILD_DIR_TEMP}}/
-
-          mv third-party/updater/downloads/linux-arm64/updater $updater_path
-          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          yarn release:linux
-          mv release/*-linux-arm64-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-aarch64-*.rpm ${{env.BUILD_DIR_TEMP}}/
-          mv release/linux-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
-
-          rm -rf $updater_path
-          sed -i 's/"updater_checksum_sha512": "[^"]*",/"updater_checksum_sha512": "",/' ${{env.PACKAGE_FILE}}
-          yarn release:linux
-          mv release/*-linux-i386-*.AppImage ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-linux-i686-*.rpm ${{env.BUILD_DIR_TEMP}}/
-          mv release/linux-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
+          sudo chmod +x build.sh
+          ./build.sh
 
       - name: Upload artifact
         if: ${{ inputs.artifact_upload == true || startsWith(github.ref, 'refs/heads/main')}}
         uses: actions/upload-artifact@v3
         with:
           name: Anilibrix Plus
-          path: ${{env.BUILD_DIR_TEMP}}/*
+          path: ${{env.OUT_DIR}}/*
 
       - name: Archiving binary files
         if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         run: |
-          cd ${{env.BUILD_DIR_TEMP}}
+          cd ${{env.OUT_DIR}}
           zip -r linux-arm64-unpacked.zip linux-arm64-unpacked
           zip -r linux-unpacked.zip linux-unpacked
           zip -r linux-ia32-unpacked.zip linux-ia32-unpacked
@@ -193,4 +153,4 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           tag_name: ${{env.APP_VERSION}}
-          files: ${{env.BUILD_DIR_TEMP}}/*
+          files: ${{env.OUT_DIR}}/*
