@@ -119,5 +119,8 @@ chmod +x build.sh
 ```
 ### macOS
 ```bash
-yarn run release:mac
+chmod +x build.sh
+```
+```bash
+./build.sh
 ```
