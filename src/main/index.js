@@ -43,7 +43,8 @@ import {
   handleSafeStorageEncrypt,
   handleShowConfig,
   handleTorrentParse,
-  handleAppSystemInfo
+  handleAppSystemInfo,
+  handleGetTitleV1New
 } from '@main/handlers/app/appHandlers'
 
 // Torrent Handlers
@@ -210,7 +211,8 @@ const appHandlers = () => {
   handleRand()
   handleShowConfig()
   handleTorrentParse(),
-  handleAppSystemInfo()
+  handleAppSystemInfo(),
+  handleGetTitleV1New()
 }
 
 /**
