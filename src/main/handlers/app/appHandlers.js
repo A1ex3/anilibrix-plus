@@ -40,6 +40,8 @@ export const APP_RAND = 'app:rand'
 
 export const APP_TORRENT_PARSE = 'app:torrent_parse'
 
+export const APP_GET_TITLE_V1_NEW = 'app:get_title_v1new'
+
 /**
  * Send app about event
  *
@@ -254,6 +256,13 @@ export const handleRand = () => {
       }
       throw e
     }
+  })
+}
+
+export const invokeGetTitleV1New = (url) => ipcRenderer.invoke(APP_GET_TITLE_V1_NEW, url)
+export const handleGetTitleV1New = () => {
+  ipcMain.handle(APP_GET_TITLE_V1_NEW, async (event, rId) => {
+    return await axios.get(`https://anilibria.top/api/v1/anime/releases/` + rId).then(x => x.data)
   })
 }
 
