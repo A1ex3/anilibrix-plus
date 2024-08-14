@@ -262,7 +262,8 @@ export const handleRand = () => {
 export const invokeGetTitleV1New = (url) => ipcRenderer.invoke(APP_GET_TITLE_V1_NEW, url)
 export const handleGetTitleV1New = () => {
   ipcMain.handle(APP_GET_TITLE_V1_NEW, async (event, rId) => {
-    return await axios.get(`https://anilibria.top/api/v1/anime/releases/` + rId).then(x => x.data)
+    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint_v1new
+    return await axios.get(`${endpoint}/api/v1/anime/releases/` + rId).then(x => x.data)
   })
 }
 

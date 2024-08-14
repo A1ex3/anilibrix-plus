@@ -30,6 +30,7 @@ export default {
     },
     api: {
       endpoint: process.env.API_ENDPOINT_URL,
+      endpoint_v1new: 'https://anilibria.top',
       ext_endpoint: process.env.EXT_API_SERVER,
       static_endpoint: process.env.STATIC_ENDPOINT_URL,
       app_update_channel_endpoint: process.env.APP_UPDATE_CHANNEL_ENDPOINT_URL,
