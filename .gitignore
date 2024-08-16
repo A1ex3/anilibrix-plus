@@ -10,3 +10,5 @@ thumbs.db
 .vscode
 dist
 .env
+out/
+package-lock.json

@@ -32,8 +32,7 @@ on:
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
-  BUILD_DIR_TEMP: build_temp
-  UPDATER_VERSION: v0.0.1
+  OUT_DIR: out
 
 jobs:
   release:
@@ -53,6 +52,11 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -62,17 +66,6 @@ jobs:
         run: choco install jq
       - name: Check jq version
         run: jq --version
-
-      - name: Install make
-        run: choco install make
-      - name: Check make version
-        run: make --version
-
-      - name: patch node gyp on windows to support Visual Studio 2019
-        shell: powershell
-        run: |
-          npm install --global node-gyp@9.4.0
-          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
       - name: Get yarn cache
         id: yarn-cache
@@ -126,57 +119,25 @@ jobs:
         run: echo "APP_VERSION=$(cat ${{env.PACKAGE_FILE}} | jq -r '.version')" >> $GITHUB_ENV
 
       - name: Install dependencies
-        shell: bash
-        run: |
-          chmod +x third-party/updater/download.sh
-          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} windows-x64 && cd third-party/updater/downloads && tar -xzvf windows-x64.tar.gz && cd ../../..
-          ./third-party/updater/download.sh ${{env.UPDATER_VERSION}} windows-arm64 && cd third-party/updater/downloads && tar -xzvf windows-arm64.tar.gz && cd ../../..
-      
-          yarn
+        shell: powershell
+        run: ./configure.ps1
 
       - name: Run build
-        shell: bash
-        run: |
-          mkdir -p ${{env.BUILD_DIR_TEMP}}
-          mkdir -p third-party/updater/build/
-
-          updater_path=third-party/updater/build/updater.exe
-          sed -i 's/"from": "path\/to\/updater_file"/"from": "third-party\/updater\/build\/updater.exe"/g' ${{env.PACKAGE_FILE}}
-
-          mv third-party/updater/downloads/windows-x64/updater.exe $updater_path
-          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          yarn release:windows
-          mv release/*-win-*-setup.exe ${{env.BUILD_DIR_TEMP}}/
-          mv release/win-unpacked ${{env.BUILD_DIR_TEMP}}/
-
-          mv third-party/updater/downloads/windows-arm64/updater.exe $updater_path
-          hash=$(sha512sum $updater_path | cut -d ' ' -f 1)
-          sed -i 's/"updater_checksum_sha512": "",/"updater_checksum_sha512": "$hash",/' ${{env.PACKAGE_FILE}}
-          yarn release:windows
-          mv release/win-arm64-unpacked ${{env.BUILD_DIR_TEMP}}/
-
-          rm -rf $updater_path
-          sed -i "s/\"updater_checksum_sha512\": \"\",/\"updater_checksum_sha512\": \"$hash\",/" ${{env.PACKAGE_FILE}}
-          yarn release:windows
-          find release -type f -regex '.*-win-[0-9]+\.[0-9]+\.[0-9]+\.exe' -exec mv {} ${{env.BUILD_DIR_TEMP}} \;
-          mv release/*-win-ia32-*.exe ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-win-x64-*.exe ${{env.BUILD_DIR_TEMP}}/
-          mv release/*-win-arm64-*.exe ${{env.BUILD_DIR_TEMP}}/
-          mv release/win-ia32-unpacked ${{env.BUILD_DIR_TEMP}}/
+        shell: powershell
+        run: ./build.ps1
 
       - name: Upload artifact
         if: ${{ inputs.artifact_upload == true || startsWith(github.ref, 'refs/heads/main')}}
         uses: actions/upload-artifact@v3
         with:
           name: Anilibrix Plus
-          path: ${{env.BUILD_DIR_TEMP}}/*
+          path: ${{env.OUT_DIR}}/*
 
       - name: Archiving binary files
         if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         shell: powershell
         run: |
-          cd ${{env.BUILD_DIR_TEMP}}
+          cd ${{env.OUT_DIR}}
           Compress-Archive -Path "win-arm64-unpacked" -DestinationPath "win-arm64-unpacked.zip"
           Compress-Archive -Path "win-unpacked" -DestinationPath "win-unpacked.zip"
           Compress-Archive -Path "win-ia32-unpacked" -DestinationPath "win-ia32-unpacked.zip"
@@ -191,4 +152,4 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           tag_name: ${{env.APP_VERSION}}
-          files: ${{env.BUILD_DIR_TEMP}}/*
+          files: ${{env.OUT_DIR}}/*

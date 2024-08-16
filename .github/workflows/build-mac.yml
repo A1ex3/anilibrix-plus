@@ -32,6 +32,7 @@ on:
 env:
   ENV_EXAMPLE_FILE: .env.example
   PACKAGE_FILE: package.json
+  OUT_DIR: out
 
 jobs:
   release:
@@ -124,14 +125,18 @@ jobs:
         run: yarn
 
       - name: Run build
-        run: npm run release:mac
+        shell: bash
+        run: |
+          sudo chmod +x build.sh
+          ./build.sh
 
       - name: Upload artifact
         if: ${{ inputs.artifact_upload == true || startsWith(github.ref, 'refs/heads/main')}}
         uses: actions/upload-artifact@v3
         with:
           name: Anilibrix Plus
-          path: release/*.dmg
+          path: ${{env.OUT_DIR}}/*.dmg
+
 
       - name: Create Release
         if: ${{ startsWith(github.ref, 'refs/heads/main') }}
@@ -139,4 +144,4 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           tag_name: ${{env.APP_VERSION}}
-          files: release/*.dmg
+          files: ${{env.OUT_DIR}}/*.dmg
