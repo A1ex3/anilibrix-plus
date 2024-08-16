@@ -37,11 +37,16 @@
     </v-card>
 
     <!-- Release Tabs -->
-    <v-tabs v-if="!loading" v-model="tab" class="shrink mb-4" background-color="transparent">
-      <v-tab>Эпизоды</v-tab>
-      <v-tab>Комментарии</v-tab>
-      <v-tab v-if="torrents.length > 0">Торренты</v-tab>
-    </v-tabs>
+    <v-layout align-center justify-space-between>
+      <v-tabs v-if="!loading" v-model="tab" class="shrink mb-4" background-color="transparent">
+        <v-tab>Эпизоды</v-tab>
+        <v-tab>Комментарии</v-tab>
+        <v-tab v-if="torrents.length > 0">Торренты</v-tab>
+      </v-tabs>
+      <v-btn v-if="!loading && lastWatchedEpisode" @click="continueWatching">
+        Продолжить просмотр
+      </v-btn>
+    </v-layout>
 
     <!-- Release Components -->
     <component v-if="component" v-on="component.events" v-bind="component.props" :is="component.is"/>
@@ -90,6 +95,7 @@ export default {
   async mounted () {
     const id = this._release?.id
     if (this._release?.id) {
+      this.loadLastWatchedEpisode()
       await this.fetchAdditional(id)
     }
   },
@@ -100,7 +106,8 @@ export default {
       loading: false,
       franchises: [],
       dates: {},
-      team: null
+      team: null,
+      lastWatchedEpisode: null
     }
   },
 
@@ -219,6 +226,41 @@ export default {
         .map(({ value }) => value)
     },
 
+    loadLastWatchedEpisode() {
+      try {
+        const releaseId = this._release?.id;
+        if (!releaseId) return;
+
+        const episodes = this.episodes;
+        let lastWatchedEpisode = null;
+
+        for (let i = episodes.length - 1; i >= 0; i--) {
+          const episode = episodes[i];
+          const watchData = this.$store.getters['app/watch/getWatchedEpisode']({
+            release_id: releaseId,
+            episode_id: episode.id
+          });
+
+          if (watchData?.isSeen) {
+            lastWatchedEpisode = { ...episode, release_id: releaseId };
+          }
+        }
+
+        this.lastWatchedEpisode = lastWatchedEpisode;
+
+      } catch (error) {
+      }
+    },
+
+    continueWatching() {
+      // Check that lastWatchedEpisode refers to the current release
+      if (this.lastWatchedEpisode && this._release?.id === this.lastWatchedEpisode.release_id) {
+        toVideo(this._release, this.lastWatchedEpisode);
+      } else {
+        this.$toasted.error('Не удалось продолжить просмотр, попробуйте снова.');
+      }
+    },
+
     formatFranchises(franchises, additionalData) {
       return franchises.map(franchise => {
         return {
@@ -249,17 +291,20 @@ export default {
   watch: {
     releaseId: {
       immediate: true,
-      async handler (releaseId) {
+      async handler(releaseId) {
+
+        // Reset the state before loading a new release
+        this.lastWatchedEpisode = null;
 
         // Update if release data changed
         if (this._release === null || this._release.id !== parseInt(releaseId)) {
 
           // Get release data
-          this.loading = true
-          await this.$store.dispatchPromise('release/getRelease', releaseId)
-          await this.fetchAdditional(releaseId)
-          this.loading = false
-
+          this.loading = true;
+          await this.$store.dispatchPromise('release/getRelease', releaseId);
+          await this.fetchAdditional(releaseId);
+          this.loadLastWatchedEpisode();
+          this.loading = false;
         }
       }
     }
