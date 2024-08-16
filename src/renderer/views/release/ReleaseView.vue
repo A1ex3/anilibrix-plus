@@ -62,7 +62,7 @@ import router from '@router'
 import { catGirlFetch } from '@utils/fetch'
 import ReleaseProxy from '@proxies/release'
 
-const domain = 'https://api.wwnd.space'
+const domain = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint + '/api'
 
 const props = {
   releaseId: {
