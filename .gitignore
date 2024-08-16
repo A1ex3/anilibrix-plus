@@ -11,3 +11,4 @@ thumbs.db
 dist
 .env
 out/
+package-lock.json
