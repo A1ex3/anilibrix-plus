@@ -17,8 +17,6 @@
       :class="['scroll-to-top', { 'visible': showScrollButton }]"
       fab
       small
-      color="#353535"
-      dark
       @click="scrollToTopFunction">
       <v-icon color="white">mdi-arrow-up</v-icon>
     </v-btn>
