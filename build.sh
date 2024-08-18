@@ -1,5 +1,5 @@
 #!/bin/bash
 
-BUILD_SCRIPT="build.py"
+BUILD_SCRIPT="_build_.py"
 
 python3 ./$BUILD_SCRIPT

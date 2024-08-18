@@ -1,3 +1,3 @@
-$env:BUILD_SCRIPT="build.py"
+$env:BUILD_SCRIPT="_build_.py"
 
 python ./$env:BUILD_SCRIPT
