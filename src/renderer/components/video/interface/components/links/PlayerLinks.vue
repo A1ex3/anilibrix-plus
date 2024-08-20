@@ -9,20 +9,7 @@
             <v-icon size="24">mdi-view-column</v-icon>
           </v-btn>
         </template>
-        <span>К списку релизов</span>
-      </v-tooltip>
-
-
-      <!-- Release -->
-      <v-tooltip right :attach="$refs.links">
-        <template v-slot:activator="{on}">
-          <v-btn v-on="on" icon large @click="() => toRelease(release)">
-            <v-avatar size="24">
-              <img v-bind="{src}">
-            </v-avatar>
-          </v-btn>
-        </template>
-        <span>{{ title }}</span>
+        <span>Релизы</span>
       </v-tooltip>
 
       <!-- Catalog -->
@@ -35,6 +22,16 @@
         <span>Каталог</span>
       </v-tooltip>
 
+      <!-- Schedule -->
+      <v-tooltip right :attach="$refs.links">
+        <template v-slot:activator="{on}">
+          <v-btn v-on="on" icon large :to="{name: 'schedule'}">
+            <v-icon size="24">mdi-calendar</v-icon>
+          </v-btn>
+        </template>
+        <span>Расписание</span>
+      </v-tooltip>
+
       <!-- Favorites -->
       <v-tooltip right :attach="$refs.links">
         <template v-slot:activator="{on}">
@@ -45,6 +42,17 @@
         <span>Избранное</span>
       </v-tooltip>
 
+      <!-- Release -->
+      <v-tooltip right :attach="$refs.links">
+        <template v-slot:activator="{on}">
+          <v-btn v-on="on" icon large @click="() => toRelease(release)">
+            <v-avatar size="24">
+              <img v-bind="{src}">
+            </v-avatar>
+          </v-btn>
+        </template>
+        <span>{{ title }}</span>
+      </v-tooltip>
 
       <!-- Episodes -->
       <v-tooltip right :attach="$refs.links">
