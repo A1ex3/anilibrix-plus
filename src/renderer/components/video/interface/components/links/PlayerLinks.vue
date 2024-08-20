@@ -25,6 +25,15 @@
         <span>{{ title }}</span>
       </v-tooltip>
 
+      <!-- Catalog -->
+      <v-tooltip right :attach="$refs.links">
+        <template v-slot:activator="{on}">
+          <v-btn v-on="on" icon large :to="{name: 'catalog'}">
+            <v-icon size="24">mdi-folder-text-outline</v-icon>
+          </v-btn>
+        </template>
+        <span>Каталог</span>
+      </v-tooltip>
 
       <!-- Favorites -->
       <v-tooltip right :attach="$refs.links">
