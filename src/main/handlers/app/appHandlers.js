@@ -13,8 +13,10 @@ axiosRetry(axios, {
   retries: 10,
   retryCondition: function (response) {
     if (response.status === 404) return false
+    if (response.status === 401) return false
 
-    return axiosRetry.isNetworkOrIdempotentRequestError(response)
+    return true
+    //return axiosRetry.isNetworkOrIdempotentRequestError(response)
   }
 })
 
