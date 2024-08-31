@@ -4,20 +4,21 @@ import json
 import re
 import shutil
 import subprocess
+from build.scripts.python.libs import logger
 
 def make_dir(dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
-        print(f"Directory created: {dir_path}")
+        logger.info(f"Directory created: {dir_path}")
     else:
-        print(f"Directory already exists: {dir_path}")
+        logger.info(f"Directory already exists: {dir_path}")
 
 def remove_directory(path):
     if os.path.exists(path) and os.path.isdir(path):
         shutil.rmtree(path)
-        print(f"Directory '{path}' has been successfully removed.")
+        logger.info(f"Directory '{path}' has been successfully removed.")
     else:
-        print(f"Directory '{path}' does not exist or is not a directory.")
+        logger.info(f"Directory '{path}' does not exist or is not a directory.")
 
 def get_line_from_file(file_path, line_number = 1):
     try:
@@ -28,7 +29,7 @@ def get_line_from_file(file_path, line_number = 1):
             else:
                 return None
     except FileNotFoundError:
-        print(f"File not found: {file_path}")
+        logger.error(f"File not found: {file_path}")
         return None
 
 def move_by_patterns(source_dir, destination_dir, patterns):
@@ -44,9 +45,9 @@ def move_by_patterns(source_dir, destination_dir, patterns):
             dest_path = os.path.join(destination_dir, entry)
             try:
                 shutil.move(entry_path, dest_path)
-                print(f"Moved: {entry_path} -> {dest_path}")
+                logger.info(f"Moved: {entry_path} -> {dest_path}")
             except Exception as e:
-                print(f"Moving error {entry_path}: {e}")
+                logger.error(f"Moving error {entry_path}: {e}")
 
 def run_shell_command(command, cwd=None):
     try:
@@ -149,7 +150,7 @@ def main():
 
         if CURRENT_OS == 'windows':
             # Build for Windows-x64
-            print("Build for Windows-x64...")
+            logger.info("Build for Windows-x64...")
             third_party = ThirdParty()
             third_party_updater = third_party.updater(THIRD_PARTY_UPDATER_PATH, CURRENT_OS, ARCH_X64)
 
@@ -158,13 +159,13 @@ def main():
             package_json.write_json_file()
             rsc = run_shell_command('yarn release:windows', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'.*-win-.*-setup\.exe$', r'win-unpacked$'])
             remove_directory(RELEASE_DIR)
-            print("Windows-x64 application build is complete")
+            logger.info("Windows-x64 application build is complete")
 
             # Build for Windows-arm64
-            print("Build for Windows-arm64...")
+            logger.info("Build for Windows-arm64...")
             third_party = ThirdParty()
             third_party_updater = third_party.updater(THIRD_PARTY_UPDATER_PATH, CURRENT_OS, ARCH_ARM64)
 
@@ -173,26 +174,26 @@ def main():
             package_json.write_json_file()
             rsc = run_shell_command('yarn release:windows', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'win-arm64-unpacked$'])
             remove_directory(RELEASE_DIR)
-            print("Windows-arm64 application build is complete")
+            logger.info("Windows-arm64 application build is complete")
 
             # Build for Windows-other
-            print("Build for Windows-other...")
+            logger.info("Build for Windows-other...")
             package_json.set_path_to_updater_file(UPDATER_PATH_PLACEHOLDER)
             package_json.set_updater_checksum_sha512('')
             package_json.write_json_file()
             rsc = run_shell_command('yarn release:windows', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'.*-win-[0-9]+\.[0-9]+\.[0-9]+\.exe$', r'.*-win-ia32-.*\.exe$', r'.*-win-x64-.*\.exe$', r'.*-win-arm64-.*\.exe$', r'win-ia32-unpacked$'])
             remove_directory(RELEASE_DIR)
-            print("Windows-other application build is complete")
+            logger.info("Windows-other application build is complete")
 
         elif CURRENT_OS == 'linux':
             # Build for Linux-x64
-            print("Build for Linux-x64...")
+            logger.info("Build for Linux-x64...")
             third_party = ThirdParty()
             third_party_updater = third_party.updater(THIRD_PARTY_UPDATER_PATH, CURRENT_OS, ARCH_X64)
 
@@ -201,13 +202,13 @@ def main():
             package_json.write_json_file()
             rsc = run_shell_command('yarn release:linux', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'.*-linux-amd64-.*\.snap', r'.*-linux-x86_64-.*\.AppImage', r'.*-linux-x86_64-.*\.rpm', r'linux-unpacked'])
             remove_directory(RELEASE_DIR)
-            print("Linux-x64 application build is complete")
+            logger.info("Linux-x64 application build is complete")
 
             # Build for Linux-arm64
-            print("Build for Linux-arm64...")
+            logger.info("Build for Linux-arm64...")
             third_party = ThirdParty()
             third_party_updater = third_party.updater(THIRD_PARTY_UPDATER_PATH, CURRENT_OS, ARCH_ARM64)
 
@@ -216,35 +217,35 @@ def main():
             package_json.write_json_file()
             rsc = run_shell_command('yarn release:linux', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'.*-linux-arm64-.*\.AppImage', r'.*-linux-aarch64-.*\.rpm', r'linux-arm64-unpacked'])
             remove_directory(RELEASE_DIR)
-            print("Linux-arm64 application build is complete")
+            logger.info("Linux-arm64 application build is complete")
 
             # Build for Linux-other
-            print("Build for Linux-other...")
+            logger.info("Build for Linux-other...")
             package_json.set_path_to_updater_file(UPDATER_PATH_PLACEHOLDER)
             package_json.set_updater_checksum_sha512('')
             package_json.write_json_file()
             rsc = run_shell_command('yarn release:linux', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'.*-linux-i386-.*\.AppImage', r'.*-linux-i686-.*\.rpm', r'linux-ia32-unpacked'])
             remove_directory(RELEASE_DIR)
-            print("Linux-other application build is complete")
+            logger.info("Linux-other application build is complete")
 
         elif CURRENT_OS == 'darwin':
             # Build for macOS-x64
-            print("Build for macOS-x64...")
+            logger.info("Build for macOS-x64...")
             rsc = run_shell_command('yarn release:mac', CWD)
             if rsc[2] > 0:
-                print(rsc)
+                logger.info(rsc)
             move_by_patterns('release', OUT_DIR, [r'.*\.dmg'])
             remove_directory(RELEASE_DIR)
-            print("macOS-x64 application build is complete")
+            logger.info("macOS-x64 application build is complete")
 
         else:
-            print("This operating system is not supported!")
+            logger.fatal("This operating system is not supported!")
     finally:
         package_json.clean(UPDATER_PATH_PLACEHOLDER)
 

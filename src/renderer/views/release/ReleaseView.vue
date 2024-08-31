@@ -44,7 +44,7 @@
         <v-tab v-if="torrents.length > 0">Торренты</v-tab>
       </v-tabs>
       <v-btn v-if="!loading && lastWatchedEpisode" @click="continueWatching">
-        Продолжить просмотр
+        Продолжить просмотр c {{ lastWatchedEpisode.id }} серии
       </v-btn>
     </v-layout>
 

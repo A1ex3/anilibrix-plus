@@ -6,21 +6,19 @@ on:
       - 'main'
     paths-ignore:
       - 'LICENSE'
-      - 'README.md'
-      - '.gitignore'
+      - '**/.gitignore'
+      - '**/.README.md'
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - 'updater/README.md'
   pull_request:
     branches:
       - 'main'
     paths-ignore:
       - 'LICENSE'
-      - 'README.md'
-      - '.gitignore'
+      - '**/.gitignore'
+      - '**/.README.md'
       - '.github/assets/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - 'updater/README.md'
 
 env:
   PACKAGE_FILE: package.json
