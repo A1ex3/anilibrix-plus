@@ -9,9 +9,9 @@
           {{ day }}
         </v-tab>
       </v-tabs>
-      <div v-for="(day, index) in data" :key="index" class="slide-container">
-        <v-slide-group v-if="index === selectedDayIndex" show-arrows>
-          <v-slide-item v-for="release in day.list" :key="release.id" class="mx-2">
+      <v-container>
+        <v-row>
+          <v-col v-for="release in data[selectedDayIndex].list" :key="release.id" cols="12" sm="6" md="4" lg="3">
             <v-card class="schedule-card" :ref="release.id" @click="toRelease(release)">
               <v-img :src="staticEndpointURL + release.posters.small.url" class="schedule-image">
                 <div class="overlay">
@@ -20,9 +20,9 @@
                 </div>
               </v-img>
             </v-card>
-          </v-slide-item>
-        </v-slide-group>
-      </div>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-layout>
   </v-fade-transition>
 </template>
@@ -82,8 +82,8 @@ export default {
 }
 
 .schedule-card {
-  width: 250px; 
-  max-width: 250px;
+  width: 100%;
+  max-width: 350px;
   margin: 0 auto;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   position: relative;
@@ -93,9 +93,9 @@ export default {
 .schedule-image {
   object-fit: cover;
   transition: 0.3s ease;
-  height: calc(35vh + 150px); /* Adjusting height to be responsive within the range */
-  min-height: 350px; /* Minimum height */
-  max-height: 500px; /* Maximum height */
+  height: calc(35vh + 150px);
+  min-height: 350px;
+  max-height: 500px;
   width: 100%;
 }
 
@@ -133,25 +133,6 @@ export default {
   font-size: 14px;
   color: #ccc;
   text-align: center;
-}
-
-.slide-container {
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.v-slide-group {
-  overflow: hidden;
-  max-width: 100%;
-}
-
-.v-slide-item {
-  display: inline-block;
-  vertical-align: top;
-  margin: 0 8px;
-  width: 100%;
-  max-width: 250px;
 }
 
 .current-day {

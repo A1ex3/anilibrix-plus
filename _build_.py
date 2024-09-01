@@ -203,7 +203,7 @@ def main():
             rsc = run_shell_command('yarn release:linux', CWD)
             if rsc[2] > 0:
                 logger.info(rsc)
-            move_by_patterns('release', OUT_DIR, [r'.*-linux-amd64-.*\.snap', r'.*-linux-x86_64-.*\.AppImage', r'.*-linux-x86_64-.*\.rpm', r'linux-unpacked'])
+            move_by_patterns('release', OUT_DIR, [r'.*-linux-x86_64-.*\.AppImage', r'linux-unpacked'])
             remove_directory(RELEASE_DIR)
             logger.info("Linux-x64 application build is complete")
 
@@ -218,7 +218,7 @@ def main():
             rsc = run_shell_command('yarn release:linux', CWD)
             if rsc[2] > 0:
                 logger.info(rsc)
-            move_by_patterns('release', OUT_DIR, [r'.*-linux-arm64-.*\.AppImage', r'.*-linux-aarch64-.*\.rpm', r'linux-arm64-unpacked'])
+            move_by_patterns('release', OUT_DIR, [r'.*-linux-arm64-.*\.AppImage', r'linux-arm64-unpacked'])
             remove_directory(RELEASE_DIR)
             logger.info("Linux-arm64 application build is complete")
 
@@ -230,7 +230,7 @@ def main():
             rsc = run_shell_command('yarn release:linux', CWD)
             if rsc[2] > 0:
                 logger.info(rsc)
-            move_by_patterns('release', OUT_DIR, [r'.*-linux-i386-.*\.AppImage', r'.*-linux-i686-.*\.rpm', r'linux-ia32-unpacked'])
+            move_by_patterns('release', OUT_DIR, [r'.*-linux-amd64-.*\.snap', r'.*-linux-i386-.*\.AppImage', r'.*-linux-aarch64-.*\.rpm', r'.*-linux-x86_64-.*\.rpm', r'.*-linux-i686-.*\.rpm', r'linux-ia32-unpacked'])
             remove_directory(RELEASE_DIR)
             logger.info("Linux-other application build is complete")
 
