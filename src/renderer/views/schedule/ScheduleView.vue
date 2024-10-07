@@ -13,10 +13,10 @@
         <v-row>
           <v-col v-for="release in data[selectedDayIndex].list" :key="release.id" cols="12" sm="6" md="4" lg="3">
             <v-card class="schedule-card" :ref="release.id" @click="toRelease(release)">
-              <v-img :src="staticEndpointURL + release.posters.small.url" class="schedule-image">
+              <v-img :src="staticEndpointURL + release.poster.optimized.src" class="schedule-image">
                 <div class="overlay">
-                  <v-card-title class="title">{{ release.names.ru }}</v-card-title>
-                  <v-card-subtitle class="subtitle">Эпизоды: {{ release.player.episodes.string }}</v-card-subtitle>
+                  <v-card-title class="title">{{ release.name.main }}</v-card-title>
+                  <v-card-subtitle class="subtitle">Эпизоды: {{ release.episodes_total }}</v-card-subtitle>
                 </div>
               </v-img>
             </v-card>
@@ -52,13 +52,12 @@ export default {
     let _scheduleProxy = new ScheduleProxy();
     try {
       let scheduleResponse = await _scheduleProxy.getSchedule();
-      this.data = scheduleResponse;
 
-      // Determine today's index
-      let today = new Date().getDay(); // 0 (Sunday) to 6 (Saturday)
-      this.todayIndex = today === 0 ? 6 : today - 1; // Adjust index for Sunday
+      this.data = this.groupReleasesByDay(scheduleResponse);
 
-      // Set selectedDayIndex to today
+      let today = new Date().getDay();
+      this.todayIndex = today === 0 ? 6 : today - 1;
+
       this.selectedDayIndex = this.todayIndex;
 
       this.staticEndpointURL = require('@store/index').default?.state?.app?.settings?.system?.api?.static_endpoint;
@@ -66,12 +65,23 @@ export default {
       console.error(error);
       this.$toasted.error('Не удалось получить расписание релизов');
     } finally {
-      this.loading = false; // Hide loading spinner when data fetching is done
+      this.loading = false;
     }
   },
 
   methods: {
-    toRelease
+    toRelease,
+    
+    groupReleasesByDay(releases) {
+      const days = Array(7).fill(null).map(() => ({ list: [] }));
+
+      releases.forEach((item) => {
+        const dayIndex = (item.release.publish_day.value - 1) % 7;
+        days[dayIndex].list.push(item.release);
+      });
+
+      return days;
+    },
   },
 };
 </script>

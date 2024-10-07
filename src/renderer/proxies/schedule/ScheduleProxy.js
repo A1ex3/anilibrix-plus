@@ -27,12 +27,7 @@ export default class ScheduleProxy extends BaseProxy{
    * @return {Promise}
    */
   async getSchedule(){
-    const params = {
-      parameters: {
-        filter: "id,names.ru,posters.small.url,type.full_string,player.episodes.string"
-      }
-    }
-    const response = await this.submit('GET', this.getApiEndpointExtend("v3") + '/title/schedule', params)
+    const response = await this.submit('GET', this.getApiEndpointNew() + '/anime/schedule/week')
 
     return this.handleResponse(response)
   }

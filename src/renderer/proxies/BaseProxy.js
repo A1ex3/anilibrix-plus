@@ -51,12 +51,24 @@ export default class BaseProxy {
   /**
    * Get api endpoint url
    *
+   * @deprecated
    * @return {string}
    */
   getApiEndpoint () {
     const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
     console.log('Endpoint', endpoint)
     return endpoint + '/public/api/index.php'
+  }
+
+  /**
+   * Get new api endpoint url
+   *
+   * @return {string}
+   */
+  getApiEndpointNew () {
+    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint_v1new
+    console.log('Endpoint', endpoint)
+    return endpoint + '/api/v1'
   }
 
   /**
